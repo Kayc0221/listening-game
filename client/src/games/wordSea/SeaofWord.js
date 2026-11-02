@@ -37,30 +37,27 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     
 
 
+    // 平均分數 (0-10，可能有小數) → 難度 1-3 (要記的目標字數)
     const convertScoreToDifficulty = (score) => {
-        if (score >= 1 && score <= 3) {
-            return 1; // 分数 1-3 映射到难度 1
-        } else if (score >= 4 && score <= 6) {
-            return 2; // 分数 4-6 映射到难度 2
-        } else {
-            return 3; // 分数 7-10 映射到难度 3
-        }
+        if (score <= 3) return 1;
+        if (score <= 6) return 2;
+        return 3;
     };
 
-    const playAudioAt = (file, delay) => {
+    const playAudioAt = (file, delay, onEnded) => {
         setTimeout(() => {
-            const audioIndex = addAudio(file, false);
+            const audioIndex = addAudio(file, false, false, null, onEnded);
             setNewIndex1(audioIndex);
             playAudio(audioIndex);
         }, delay);
     };
 
     // 依難度先每 1.3 秒播一個目標字，再播整句 (再聽一次時整句提早播)
-    const playAudioByDifficulty = (difficulty) => {
+    const playAudioByDifficulty = (difficulty, onSentenceEnded) => {
         for (let i = 1; i <= difficulty; i++) {
             playAudioAt(`game4/${choicedGamedata[2]}-${i}.wav`, 1300 * (i - 1));
         }
-        playAudioAt(`game4/${choicedGamedata[2]}.wav`, hasCheckedChoices ? 4500 : 6500);
+        playAudioAt(`game4/${choicedGamedata[2]}.wav`, hasCheckedChoices ? 4500 : 6500, onSentenceEnded);
     };
 
     const handleButtonClick = () => {
@@ -69,19 +66,26 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
         setShowTarget(true);
         pauseAudio(0);
-        playAudioByDifficulty(Difficulty);
 
         // 如果已经确认答案，可以再次播放
         if (hasCheckedChoices) {
+            playAudioByDifficulty(Difficulty);
             return;
         }
 
-        setTimeout(() => setShowState(3), 2500);
-        setTimeout(() => {
+        // 整句播完才顯示選項並恢復背景音樂 (句子長 12-25 秒，固定等 25 秒會太早或太晚)
+        let revealed = false;
+        const revealChoices = () => {
+            if (revealed) return;
+            revealed = true;
             setShowState(4);
             playAudio(0);
             setStartChoicesAnimation(true);
-        }, 25000);
+        };
+        playAudioByDifficulty(Difficulty, () => setTimeout(revealChoices, 800));
+        setTimeout(revealChoices, 35000); // 保險：音訊被中斷沒有觸發 ended 時
+
+        setTimeout(() => setShowState(3), 2500);
         setButtonClicked(true);
     };
 
@@ -186,6 +190,11 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
             const score = correct.size/Difficulty*10;
 
+            // 只記錄第一次作答的分數 (全對也要記，否則這題會被當成沒玩過、之後又被抽到)
+            if (!oneMoreRound) {
+                submitScore(username, choicedGamedata[2], score);
+            }
+
             if (score !== 10 && !oneMoreRound) {
                 setOneMoreRound(true);
                 setSelected(new Set());
@@ -193,7 +202,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 setIncorrectChoices(new Set());
                 setMissedChoices(new Set());
                 setShowTarget(true);
-                submitScore(username, choicedGamedata[2], score);
             }else{
                 setHasCheckedChoices(true);  // 標記已經進行過結算
                 setOneMoreRound(false);

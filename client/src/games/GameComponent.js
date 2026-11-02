@@ -60,7 +60,8 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
 
     return (
         <>
-            <div className="game-container">
+            {/* 顯示小訣竅時移除遊戲畫面：否則最後一關看不見的選項按鈕會蓋在小訣竅上，擋住「點擊後繼續」 */}
+            {!showExpandedTips && <div className="game-container">
                 <div className="fade-in-and-grow">
                     {isGameStarted ? (
                         <Level
@@ -80,7 +81,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
                         </>
                     )}
                 </div>
-            </div>
+            </div>}
             {showExpandedTips && (
                 <>
                     <img

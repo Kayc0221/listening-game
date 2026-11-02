@@ -30,8 +30,8 @@ export const AudioProvider = ({ children }) => {
         }
     };
 
-    // 加入音訊並返回其在陣列中的索引
-    const addAudio = (src, shouldLoop= false, isBackground = false, mixedAudioBuffer = null) => {
+    // 加入音訊並返回其在陣列中的索引；onEnded 會在自然播完時呼叫 (被其他音訊中斷時不會)
+    const addAudio = (src, shouldLoop= false, isBackground = false, mixedAudioBuffer = null, onEnded = null) => {
         let newAudio;
         let source;
 
@@ -62,7 +62,10 @@ export const AudioProvider = ({ children }) => {
         // 播完後移除「這個」音訊 (之前用陣列最後一個索引，播完時可能已經不是它)
         const index = audioSources.current.length;
         if (!shouldLoop || mixedAudioBuffer) {
-            newAudio.addEventListener('ended', () => removeAudio(index));
+            newAudio.addEventListener('ended', () => {
+                removeAudio(index);
+                if (onEnded) onEnded();
+            });
         }
 
         newAudio.isBackground = isBackground;

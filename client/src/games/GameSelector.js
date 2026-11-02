@@ -6,20 +6,22 @@ import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
 import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
-import { ApiError, selectRandomGames } from '../api';
+import { ApiError, getPlayedGames, selectRandomGames } from '../api';
 import { asset } from '../asset';
+import { TOTAL_SESSIONS, completedSessions } from '../progress';
 
 
 const GameSelector = ({ username }) => {
-    const { setIsAuthenticated, setCurrentUser, setBackground } = useAuth();
+    const { setIsAuthenticated, setCurrentUser, setBackground, refreshProgress } = useAuth();
     const [selectedGame, setSelectedGame] = useState(null);
     const [selectedGames, setSelectedGames] = useState([]); // 在這裡宣告
 
     const [isAnimating, setIsAnimating] = useState(false);
-    const [finishAnimating, setfinishAnimating] = useState(false);
     const [canConfirm, setCanConfirm] = useState(false);
     const [showExpandedGame, setShowExpandedGame] = useState(false);
-    const [gameRounds, setGameRounds] = useState(0);
+    const [gameRounds, setGameRounds] = useState(0); // 今天已經玩完幾個遊戲；4 = 今天的冒險結束
+    const [notice, setNotice] = useState(null); // 暫時取代輪盤下方訊息的提示 (例如某個遊戲沒有題目)
+    const [isJourneyComplete, setIsJourneyComplete] = useState(false);
 
     const [availableGames, setAvailableGames] = useState([1, 2, 3, 4]);
     const { pauseAudio, removeAudio } = useAudio();
@@ -41,51 +43,84 @@ const GameSelector = ({ username }) => {
         setBackground(asset(`/image/main-menu.png`));
     };
 
-    const fetchRandomGames = async () => {
-        //pauseAudio(0);
-        let data;
+    // 取得這個遊戲要玩的關卡；回傳 null 表示這個遊戲目前沒有新題目
+    const fetchRandomGames = async (gameType) => {
+        let games;
         try {
-            data = await selectRandomGames(username, selectedGame);
+            games = (await selectRandomGames(username, gameType)).selectedGames;
         } catch (error) {
-            console.error("Failed to fetch random games:", error);
-            if (error instanceof ApiError) {
-                window.alert("沒有更多遊戲可以玩了! 返回主選單!");
-                exitGame();
+            if (error instanceof ApiError && error.status === 404) {
+                return null;
             }
-            return;
+            throw error;
         }
-        setSelectedGames(data.selectedGames);
 
         // ㄅㄅ森林 (3) 的後段關卡使用 gameType 5 的題目
-        if (selectedGame === 3) {
+        if (gameType === 3) {
             try {
-                const additionalData = await selectRandomGames(username, 5);
-                setSelectedGames([...data.selectedGames, ...additionalData.selectedGames]);
+                games = [...games, ...(await selectRandomGames(username, 5)).selectedGames];
             } catch (error) {
                 console.error("Failed to fetch games for gameType 5:", error);
             }
         }
+        return games;
     };
-    
 
+    // 輪盤停下後：先拿到題目才展開遊戲；沒有題目就換下一個遊戲，而不是直接登出
+    const prepareGame = async (gameType, remainingGames) => {
+        const shownAt = Date.now();
+        let games;
+        try {
+            games = await fetchRandomGames(gameType);
+        } catch (error) {
+            console.error("Failed to fetch random games:", error);
+            window.alert("無法連線到伺服器，請稍後再試！");
+            exitGame();
+            return;
+        }
+
+        if (games && games.length) {
+            setSelectedGames(games);
+            // 維持原本「停下 2 秒後展開」的節奏
+            setTimeout(() => setShowExpandedGame(true), Math.max(0, 2000 - (Date.now() - shownAt)));
+            return;
+        }
+
+        if (remainingGames.length) {
+            setNotice(`${GAMES[gameType].name} 目前沒有新的題目，換一個遊戲吧！`);
+            setTimeout(() => {
+                setNotice(null);
+                startGameAnimation();
+            }, 3000);
+        } else if (gameRounds > 0) {
+            setGameRounds(4); // 剩下的遊戲都沒有題目：直接結束今天的冒險
+        } else {
+            window.alert("目前沒有可以玩的遊戲了！返回主選單！");
+            exitGame();
+        }
+    };
 
     const handleGameEnd = () => {
         setShowExpandedGame(false);
-        if (gameRounds < 4) {
-            setCanConfirm(false);
-            setGameRounds(prevRounds => prevRounds + 1);
-            setTimeout(() => setCanConfirm(true), 5000);
-            setTimeout(startGameAnimation, 5000);
+        refreshProgress();
+        if (!availableGames.length) {
+            setGameRounds(4);
+            return;
         }
+        setCanConfirm(false);
+        setGameRounds(prevRounds => prevRounds + 1);
+        setTimeout(() => setCanConfirm(true), 5000);
+        setTimeout(startGameAnimation, 5000);
     }
 
-
-
+    // 今天的冒險結束：如果 36 次冒險都完成了，顯示最終結局
     useEffect(() => {
-        if (gameRounds === 4) {
-            setBackground(asset(`/image/hint.jpg`));
-        }
-    }, [gameRounds]);  // 當 canConfirm 或 hasFetched 變化時觸發
+        if (gameRounds !== 4) return;
+        setBackground(asset(`/image/hint.jpg`));
+        getPlayedGames(username)
+            .then((data) => setIsJourneyComplete(completedSessions((data.playedGames || []).length) >= TOTAL_SESSIONS))
+            .catch((error) => console.error('Error fetching played games:', error));
+    }, [gameRounds]);
 
 
     useEffect(() => {
@@ -108,13 +143,11 @@ const GameSelector = ({ username }) => {
             } else {
                 setCanConfirm(true);
                 setIsAnimating(false);
-                setTimeout(() => {
-                    setShowExpandedGame(true);
-                }, 2000);
-                setfinishAnimating(true);
 
-                // 移除選擇的遊戲
-                setAvailableGames(prevGames => prevGames.filter(game => game !== currentGame));
+                // 移除選擇的遊戲，然後準備它的題目
+                const remainingGames = availableGames.filter(game => game !== currentGame);
+                setAvailableGames(remainingGames);
+                prepareGame(currentGame, remainingGames);
             }
         };
 
@@ -122,14 +155,6 @@ const GameSelector = ({ username }) => {
             runAnimation();
         }
     }, [isAnimating]);
-
-
-    useEffect(() => {
-        if (finishAnimating) {
-            fetchRandomGames(); 
-            setfinishAnimating(false);
-        }
-    }, [finishAnimating]);  // 當 canConfirm 或 hasFetched 變化時觸發
 
     useEffect(() => {
         if (showExpandedGame) {
@@ -187,15 +212,9 @@ const GameSelector = ({ username }) => {
                                 <div className="game-button exit-button" onClick={exitGame}></div>
                             </div>
                         )}
-                        {!canConfirm ? (
-                            <div className="text-container ">
-                                <h1>{getMessageByRound(gameRounds+4)}</h1>
-                            </div>
-                        ) : (
-                                <div className="text-container ">
-                                    <h1>{getMessageByRound(gameRounds)}</h1>
-                                </div>
-                        )}
+                        <div className="text-container ">
+                            <h1>{notice || getMessageByRound(canConfirm ? gameRounds : gameRounds + 4)}</h1>
+                        </div>
                     </div>
                 </>
              )}
@@ -215,7 +234,7 @@ const GameSelector = ({ username }) => {
                     />
                 </>
             )}
-            {gameRounds === 4 && (
+            {gameRounds === 4 && !isJourneyComplete && (
                 <>
                     <img
                         src={asset(`/image/End-round.png`)}
@@ -231,7 +250,7 @@ const GameSelector = ({ username }) => {
                 </>
             )}
 
-            {gameRounds === 5 && (
+            {gameRounds === 4 && isJourneyComplete && (
                 <>
                     <img
                         src={asset(`/image/endding.jpg`)}

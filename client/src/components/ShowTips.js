@@ -4,8 +4,12 @@ import { useAuth } from '../contexts/AuthContext'; // 引入 useAuth
 import './ShowTips.css';  // 引入CSS文件
 import { getTip } from '../api';
 
+// 試算表的 tips 還沒有內容 (或讀取失敗) 時顯示的訊息
+const FALLBACK_MESSAGE = '完成了！小怪獸又收集到一些燃料囉！';
+
 const ShowTips = ({ classValue, onClick }) => {
     const [tip, setTip] = useState('');
+    const [isLoaded, setIsLoaded] = useState(false);
     const { addAudio, playAudio } = useAudio();
     const { shownTips, setShownTips } = useAuth(); // 使用 useAuth 來訪問和更新 shownTips
 
@@ -33,6 +37,8 @@ const ShowTips = ({ classValue, onClick }) => {
                 }
             } catch (error) {
                 console.error("An error occurred:", error);
+            } finally {
+                if (isMounted) setIsLoaded(true);
             }
         };
 
@@ -48,8 +54,7 @@ const ShowTips = ({ classValue, onClick }) => {
             <div className="fade-in-and-grow">
                 <div className="show-tips-container ">
                     <p>
-                    🎓溝通小訣竅:<br />
-                    {tip}<br />
+                    {tip ? <>🎓溝通小訣竅:<br />{tip}</> : (isLoaded ? FALLBACK_MESSAGE : '…')}<br />
                     點擊後繼續...
                     </p>
                 </div>

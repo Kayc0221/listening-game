@@ -44,16 +44,12 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
 
+    // 平均分數 (0-10) → 難度 0-3 (題目資料中第幾組選項)；之前分數 < 1 會落到最難的 3
     const convertScoreToDifficulty = (score) => {
-        if (score >= 1 && score <= 2.5) {
-            return 0; 
-        } else if (score > 2.5 && score <= 5) {
-            return 1; 
-        } else if(score > 5 && score <= 7.5){
-            return 2; 
-        }else {
-            return 3; 
-        }
+        if (score <= 2.5) return 0;
+        if (score <= 5) return 1;
+        if (score <= 7.5) return 2;
+        return 3;
     };
 
 
