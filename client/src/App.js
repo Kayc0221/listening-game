@@ -12,7 +12,6 @@ import CursorTail from './CursorTail';
 import { useAudio } from './AudioContext';
 
 import CloudMessage from './CloudMessage'; // 確保路徑正確
-import EndGameBar from './EndGameBar';
 
 const App = () => {
     const { addAudio, playAudio } = useAudio();
