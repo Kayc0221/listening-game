@@ -7,7 +7,7 @@ import { useAudio } from '../../contexts/AudioContext';
 import { createMixedAudio } from "./Audio_SNR";
 import ScoreStarsField from '../../components/ScoreStarsField';
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { getAverageScore, submitScore } from '../../api';
 let debounceTimer = null;
 
 
@@ -33,43 +33,7 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [snrRate, setSnrRate] = useState(0); // 假设默认值为 1
 
     
-    const writeToDatabase = async (collection, userInfo, username) => {
-        const url = `${apiBaseUrl}/${collection}/updateScore`;
 
-        const payload = {
-            username,  // 使用了傳入的 username
-            scoreInfo: userInfo.score,
-        };
-
-        try {
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (response.status === 200) {
-                console.log('Score updated successfully');
-            } else {
-                console.log('Failed to update score');
-            }
-        } catch (error) {
-            console.error('Error updating score:', error);
-        }
-    };
-
-    const fetchAverageScore = async (username) => {
-        try {
-            const response = await fetch(`${apiBaseUrl}/api/getAvarageScore?username=${encodeURIComponent(username)}`);
-            const averageScore = await response.json();
-            return averageScore;
-        } catch (error) {
-            console.error('Error fetching average score:', error);
-            return 5; // 发生错误时返回默认值 5
-        }
-    };
 
     // 将分数转换为 SNR 值的函数
     const convertScoreToSNR = (score) => {
@@ -122,7 +86,7 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     useEffect(() => {
         const fetchAndSetSNR = async () => {
             // 获取平均分数
-            const averageScore = await fetchAverageScore(username);
+            const averageScore = await getAverageScore(username);
 
             // 将分数转换为 SNR 值
             const snrStartValue = convertScoreToSNR(averageScore);
@@ -212,12 +176,9 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             console.log(missedChoices);
 
             const score = correctChoices.size;
-            const userInfo = {
-                score: `${choicedGamedata[2]} : ${score}`
-            };
 
             // 假設 userId 是用戶的唯一識別碼
-            writeToDatabase('maindata', userInfo, username);
+            submitScore(username, choicedGamedata[2], score);
 
             setIsGameEnded(true);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAudio } from '../contexts/AudioContext';
 import { useAuth } from '../contexts/AuthContext'; // 引入 useAuth
 import './ShowTips.css';  // 引入CSS文件
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { getTip } from '../api';
 
 const ShowTips = ({ classValue, onClick }) => {
     const [tip, setTip] = useState('');
@@ -14,21 +14,14 @@ const ShowTips = ({ classValue, onClick }) => {
         let isMounted = true;
 
         const fetchRandomTip = async () => {
-            let url = `${apiBaseUrl}/api/getTips?class=${classValue}`;
             try {
-                let response, data;
+                let data;
                 let attempts = 0; // 用於控制嘗試次數
                 const maxAttempts = 10; // 最多嘗試10次以避免無限循環
 
                 do {
-                    response = await fetch(url);
-                    if (response.ok) {
-                        data = await response.json();
-                        attempts++;
-                    } else {
-                        console.log("Failed to fetch tips:", response.status);
-                        return; // 如果獲取失敗，直接返回
-                    }
+                    data = await getTip(classValue);
+                    attempts++;
                 } while (shownTips.includes(data.index) && attempts < maxAttempts); // 確保新提示未被顯示過
 
                 if (isMounted && data && !shownTips.includes(data.index)) {

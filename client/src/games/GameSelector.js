@@ -5,7 +5,7 @@ import { useAudio } from '../contexts/AudioContext';
 import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
 import AnimatedTitle from '../components/AnimatedTitle';
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { ApiError, selectRandomGames } from '../api';
 
 
 const GameSelector = ({ username }) => {
@@ -48,38 +48,27 @@ const GameSelector = ({ username }) => {
 
     const fetchRandomGames = async () => {
         //pauseAudio(0);
-        const url = `${apiBaseUrl}/api/selectRandomGames?username=${username}&gameType=${selectedGame}`;
-    
+        let data;
         try {
-            // Fetch games for the initial selectedGame
-            const response = await fetch(url);
-            if (response.ok) {
-                const data = await response.json();
-                console.log(data.selectedGames);
-                setSelectedGames(data.selectedGames);
-    
-                // 额外的请求: 当 selectedGame = 3 时, 再次请求 selectedGame = 5
-                if (selectedGame === 3) {
-                    const additionalUrl = `${apiBaseUrl}/api/selectRandomGames?username=${username}&gameType=5`;
-                    const additionalResponse = await fetch(additionalUrl);
-                    let allSelectedGames = data.selectedGames;
-                    if (additionalResponse.ok) {
-                        const additionalData = await additionalResponse.json();
-                        console.log(additionalData.selectedGames);
-                        allSelectedGames = [...allSelectedGames, ...additionalData.selectedGames];
-                        console.log(allSelectedGames);
-                        setSelectedGames(allSelectedGames);
-                    } else {
-                        console.log("Failed to fetch games for gameType 5:", additionalResponse.status);
-                    }
-                }
-            } else {
-                console.log("Failed to fetch random games:", response.status);
+            data = await selectRandomGames(username, selectedGame);
+        } catch (error) {
+            console.log("Failed to fetch random games:", error);
+            if (error instanceof ApiError) {
                 window.alert("沒有更多遊戲可以玩了! 返回主選單!");
                 exitGame();
             }
-        } catch (error) {
-            console.log("An error occurred:", error);
+            return;
+        }
+        setSelectedGames(data.selectedGames);
+
+        // ㄅㄅ森林 (3) 的後段關卡使用 gameType 5 的題目
+        if (selectedGame === 3) {
+            try {
+                const additionalData = await selectRandomGames(username, 5);
+                setSelectedGames([...data.selectedGames, ...additionalData.selectedGames]);
+            } catch (error) {
+                console.log("Failed to fetch games for gameType 5:", error);
+            }
         }
     };
     

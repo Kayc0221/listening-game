@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAudio } from '../contexts/AudioContext'; // 確保路徑正確
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { login } from '../api';
 
 function Login(props) {
     const [username, setUsername] = useState('');
@@ -9,19 +9,7 @@ function Login(props) {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch(`${apiBaseUrl}/api/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
-        
-            if (!response.ok) {
-                throw new Error(`Server error ${response.status}`);
-            }
-        
-            const data = await response.json();
+            const data = await login(username, password);
             if (data.success) {
                 props.onLoginSuccess(username); // 使用 props 里的 onLoginSuccess 函数
                 console.log(`Login successful with ${username}`);

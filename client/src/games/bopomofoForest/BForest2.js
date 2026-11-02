@@ -7,7 +7,7 @@ import AudioVisualizer from '../../components/AudioVisualizer';
 import { useAudio } from '../../contexts/AudioContext';
 import ScoreStarsField from '../../components/ScoreStarsField';
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { getAverageScore, submitScore } from '../../api';
 
 
 
@@ -109,43 +109,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         return codeStr;
     };
 
-    const writeToDatabase = async (collection, userInfo, username) => {
-        const url = `${apiBaseUrl}/${collection}/updateScore`;
 
-        const payload = {
-            username,  // 使用了傳入的 username
-            scoreInfo: userInfo.score,
-        };
-
-        try { 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-
-            if (response.status === 200) {
-                console.log('Score updated successfully');
-            } else {
-                console.log('Failed to update score');
-            }
-        } catch (error) {
-            console.error('Error updating score:', error);
-        }
-    };
-
-    const fetchAverageScore = async (username) => {
-        try {
-            const response = await fetch(`${apiBaseUrl}/api/getAvarageScore?username=${encodeURIComponent(username)}`);
-            const averageScore = await response.json();
-            return averageScore;
-        } catch (error) {
-            console.error('Error fetching average score:', error);
-            return 5; // 发生错误时返回默认值 5
-        }
-    };
 
     const convertScoreToDifficulty = (score) => {
         if (score >= 1 && score <= 2.5) {
@@ -233,7 +197,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     useEffect(() => {
         const fetchAndSetDifficulty = async () => {
             // 获取平均分数
-            const averageScore = await fetchAverageScore(username);
+            const averageScore = await getAverageScore(username);
             const Difficulty = convertScoreToDifficulty(averageScore);
             setDifficulty(Difficulty);
         };
@@ -286,10 +250,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         } else {
             setAnswerResult('incorrect');
         }
-        const userInfo = {
-            score: `${choicedGamedata[2]} : ${score}`
-        };
-        writeToDatabase('maindata', userInfo, username);
+        submitScore(username, choicedGamedata[2], score);
         setHasCheckedChoices(true);
         setIsGameEnded(true);
     };

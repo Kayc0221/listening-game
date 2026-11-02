@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ProgressBar.css'; // 確保你有一個 CSS 文件名為 ProgressBar.css
 
-const apiBaseUrl = process.env.REACT_APP_API_URL;
+import { getPlayedGames } from '../api';
 
 const ProgressBar = ({ username }) => {
     const [progress, setProgress] = useState(0);
@@ -9,8 +9,7 @@ const ProgressBar = ({ username }) => {
 
     const fetchProgress = async () => {
         try {
-            const response = await fetch(`${apiBaseUrl}/api/getPlayedGames?username=${username}`);
-            const data = await response.json();
+            const data = await getPlayedGames(username);
             const playedGames = data.playedGames || [];
             console.log('playedGames:', playedGames);
             const newProgress = (playedGames.length/(3+4+2+13)); // 直接使用已玩遊戲數
