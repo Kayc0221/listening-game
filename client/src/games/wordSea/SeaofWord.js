@@ -47,70 +47,42 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
     };
 
-// 一个函数，用于根据难度播放音频
-const playAudioByDifficulty = async (difficulty) => {
-    for (let i = 1; i <= difficulty; i++) {
-        // 设置延迟播放
-        await setTimeout(() => {
-            const audioIndex = addAudio(`game4/${choicedGamedata[2]}-${i}.wav`, false);
-            setNewIndex1(audioIndex);
-             playAudio(audioIndex);
-        }, 1300 * (i - 1)); // 每隔两秒播放下一个音频
-    }
-    if (hasCheckedChoices) {
-        await setTimeout(() => {
-            const audioIndex = addAudio(`game4/${choicedGamedata[2]}.wav`, false);
+    const playAudioAt = (file, delay) => {
+        setTimeout(() => {
+            const audioIndex = addAudio(file, false);
             setNewIndex1(audioIndex);
             playAudio(audioIndex);
-        }, 4500); // 6.5秒播放下一个音频
-    } else {
-        await setTimeout(() => {
-            const audioIndex = addAudio(`game4/${choicedGamedata[2]}.wav`, false);
-            setNewIndex1(audioIndex);
-            playAudio(audioIndex);
-        }, 6500); // 6.5秒播放下一个音频
-    }
+        }, delay);
+    };
 
-};
-    
+    // 依難度先每 1.3 秒播一個目標字，再播整句 (再聽一次時整句提早播)
+    const playAudioByDifficulty = (difficulty) => {
+        for (let i = 1; i <= difficulty; i++) {
+            playAudioAt(`game4/${choicedGamedata[2]}-${i}.wav`, 1300 * (i - 1));
+        }
+        playAudioAt(`game4/${choicedGamedata[2]}.wav`, hasCheckedChoices ? 4500 : 6500);
+    };
 
-    const handleButtonClick = async () => {
+    const handleButtonClick = () => {
         if (buttonClicked) {  // 如果按钮已点击且还未确认答案，直接返回
             return;
         }
         setShowTarget(true);
-        await pauseAudio(0);
-        console.log("Start Difficulty:", Difficulty);
-
-    
-        // 调用函数以根据难度播放音频
-        await playAudioByDifficulty(Difficulty);
-    
+        pauseAudio(0);
+        playAudioByDifficulty(Difficulty);
 
         // 如果已经确认答案，可以再次播放
         if (hasCheckedChoices) {
             return;
         }
 
-        await setTimeout(() => {
-            //setShowTarget(false);
-        }, 5000);
-
-
-        const timer3 = setTimeout(() => {
-            setShowState(3)
-        }, 2500);
-        const timer4 = setTimeout(() => {
+        setTimeout(() => setShowState(3), 2500);
+        setTimeout(() => {
             setShowState(4);
-           playAudio(0);
-            setStartChoicesAnimation(true); 
+            playAudio(0);
+            setStartChoicesAnimation(true);
         }, 25000);
-        setButtonClicked(true)
-
-        return () => {
-            clearTimeout(timer3);
-            clearTimeout(timer4);
-        };
+        setButtonClicked(true);
     };
 
 
@@ -198,29 +170,28 @@ const playAudioByDifficulty = async (difficulty) => {
 
         const checkChoices = (newSelected) => {
 
-            // 使用 includes 方法來檢查 choice 是否出現在 choices[1] 中
+            // 建立新的 Set，不直接修改 state 裡的 Set
+            const correct = new Set();
+            const incorrect = new Set();
+            const missed = new Set();
             newSelected.forEach((choice) => {
                 if (ans.includes(choice)) {
-                    correctChoices.add(choice);
+                    correct.add(choice);
                 } else {
-                    incorrectChoices.add(choice);
+                    incorrect.add(choice);
                 }
             });
-            for (let i = 0; i < ans.length; i++) {
-                const char = ans[i];
-                if (!newSelected.has(char) && !incorrectChoices.has(char)) {
-                    missedChoices.add(char);
+            for (const char of ans) {
+                if (!newSelected.has(char) && !incorrect.has(char)) {
+                    missed.add(char);
                 }
             }
 
-            setCorrectChoices(correctChoices);
-            setIncorrectChoices(incorrectChoices);
-            setMissedChoices(missedChoices);
-            console.log(correctChoices);
-            console.log(incorrectChoices);
-            console.log(missedChoices);
+            setCorrectChoices(correct);
+            setIncorrectChoices(incorrect);
+            setMissedChoices(missed);
 
-            const score = correctChoices.size/Difficulty*10;
+            const score = correct.size/Difficulty*10;
 
             if (score !== 10 && !oneMoreRound) {
                 setOneMoreRound(true);

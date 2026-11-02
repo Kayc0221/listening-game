@@ -1,5 +1,5 @@
 ﻿// ChoiceGrid.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ChoiceGrid.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
 import AudioAmplitude from '../../components/AudioAmplitude';
@@ -8,7 +8,6 @@ import { createMixedAudio } from "./Audio_SNR";
 import ScoreStarsField from '../../components/ScoreStarsField';
 
 import { getAverageScore, submitScore } from '../../api';
-let debounceTimer = null;
 
 
 const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
@@ -30,7 +29,8 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [callCount, setCallCount] = useState(0);
     const [selectCount, setSelectCount] = useState(0);
 
-    const [snrRate, setSnrRate] = useState(0); // 假设默认值为 1
+    const [snrRate, setSnrRate] = useState(0);
+    const isLoadingAudio = useRef(false);
 
     
 
@@ -45,40 +45,35 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
     const handleButtonClick = async () => {
-        if (buttonClicked) {  
+        // 混音需要一點時間，載入期間再按一次不要重複播放
+        if (buttonClicked || isLoadingAudio.current) {
             return;
         }
-        debounceTimer  = setTimeout(() => { debounceTimer = null; }, 1000);
-
-        await pauseAudio(0);
-        console.log("Start SNR:", snrRate);
-
-        const mixedAudioBuffer = await createMixedAudio(`${choicedGamedata[2]}.wav`, "white_noise.WAV", snrRate);
-        const mixedAudioIndex = await addAudio(null, false,false, mixedAudioBuffer);
-        await playAudio(mixedAudioIndex);
+        isLoadingAudio.current = true;
+        let mixedAudioBuffer;
+        try {
+            pauseAudio(0);
+            mixedAudioBuffer = await createMixedAudio(`${choicedGamedata[2]}.wav`, "white_noise.WAV", snrRate);
+        } finally {
+            isLoadingAudio.current = false;
+        }
+        const mixedAudioIndex = addAudio(null, false, false, mixedAudioBuffer);
+        playAudio(mixedAudioIndex);
         setNewIndex1(mixedAudioIndex);
 
-        await setTimeout(() => {
-            playAudio(0);
-        }, 5000);
+        setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
 
+        // 已經作答過：只是再聽一次
         if (hasCheckedChoices) {
-            clearTimeout(debounceTimer);
             return;
         }
 
-        const timer3 = setTimeout(() => setShowState(3), 3000);
-        const timer4 = setTimeout(() => {
+        setTimeout(() => setShowState(3), 3000);
+        setTimeout(() => {
             setShowState(4);
-            setStartChoicesAnimation(true); 
+            setStartChoicesAnimation(true);
         }, 5000);
-        setButtonClicked(true)
-
-        return () => {
-            clearTimeout(timer3);
-            clearTimeout(timer4);
-            clearTimeout(debounceTimer);
-        };
+        setButtonClicked(true);
     };
 
     const [hasCheckedChoices, setHasCheckedChoices] = useState(false);
@@ -153,29 +148,28 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
         const checkChoices = (newSelected) => {
 
-            // 使用 includes 方法來檢查 choice 是否出現在 choices[1] 中
+            // 建立新的 Set，不直接修改 state 裡的 Set
+            const correct = new Set();
+            const incorrect = new Set();
+            const missed = new Set();
             newSelected.forEach((choice) => {
                 if (choicedGamedata[1].includes(choice)) {
-                    correctChoices.add(choice);
+                    correct.add(choice);
                 } else {
-                    incorrectChoices.add(choice);
+                    incorrect.add(choice);
                 }
             });
-            for (let i = 0; i < choicedGamedata[1].length; i++) {
-                const char = choicedGamedata[1][i];
-                if (!newSelected.has(char) && !incorrectChoices.has(char)) {
-                    missedChoices.add(char);
+            for (const char of choicedGamedata[1]) {
+                if (!newSelected.has(char) && !incorrect.has(char)) {
+                    missed.add(char);
                 }
             }
 
-            setCorrectChoices(correctChoices);
-            setIncorrectChoices(incorrectChoices);
-            setMissedChoices(missedChoices);
-            console.log(correctChoices);
-            console.log(incorrectChoices);
-            console.log(missedChoices);
+            setCorrectChoices(correct);
+            setIncorrectChoices(incorrect);
+            setMissedChoices(missed);
 
-            const score = correctChoices.size;
+            const score = correct.size;
 
             // 假設 userId 是用戶的唯一識別碼
             submitScore(username, choicedGamedata[2], score);

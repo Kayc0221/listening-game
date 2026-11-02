@@ -58,9 +58,7 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         await playAudio(Audio1_Idx,playbackRate);
 
 
-        await setTimeout(() => {
-             playAudio(0);
-        }, 5000);
+        setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
 
         // 如果已经确认答案，可以再次播放
         if (hasCheckedChoices) {
@@ -71,15 +69,8 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         setCurrentStep('speed_played');
         setButtonClicked(true);
 
-        const timer3 = setTimeout(() => setShowState(3), 3000);
-        const timer4 = setTimeout(() => {
-            setShowState(4);
-        }, 5000);
-
-        return () => {
-            clearTimeout(timer3);
-            clearTimeout(timer4);
-        };
+        setTimeout(() => setShowState(3), 3000);
+        setTimeout(() => setShowState(4), 5000);
     };
 
 

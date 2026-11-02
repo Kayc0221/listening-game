@@ -89,9 +89,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         await playAudio(Audio1_Idx);
 
 
-        await setTimeout(() => {
-            playAudio(0);
-        }, 5000);
+        setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
 
         // 如果已经确认答案，可以再次播放
         if (hasCheckedChoices) {
@@ -100,20 +98,12 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
         setButtonClicked(true);
 
-        let timer;
-
         if (buttonType==='A') {
-            timer = setTimeout(() => setShowState(3), 3000);
+            setTimeout(() => setShowState(3), 3000);
             setCurrentStep('speed_played');
         }else{
             setCurrentStep('speed_played2');
         }
-
-
-
-        return () => {
-            clearTimeout(timer);
-        };
     };
 
     const handleButtonClick_2 = async (buttonType) => {
