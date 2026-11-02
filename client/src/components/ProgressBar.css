@@ -1,67 +1,82 @@
-.progressBar-container {
+/* 收集進度：左上角的直立燃料槽。尺寸都用 vmin，視窗變寬或變高時比例不變 */
+.progress-widget {
+    --progress-color: #ffd280;
     position: absolute;
-    top: 10vw; /* 根据视口宽度调整 */
-    left: 10vh; /* 根据视口高度调整 */
-    height: 12vw; /* 根据视口宽度调整 */
-    width: 7vh; /* 根据视口高度调整 */
-    border: 0.5rem solid #ffd280;
+    top: 6vmin;
+    left: 5vmin;
     display: flex;
+    flex-direction: column;
     align-items: center;
     z-index: 1000;
 }
 
-.progress-svg {
-    position: absolute;
-    top: -5vw; /* 根据视口宽度调整 */
-    left: 60%; /* 使用百分比 */
-    height: 10vw; /* 根据视口宽度调整 */
-    width: 10vw; /* 根据视口宽度调整 */
-    animation: swing 1s infinite alternate;
+.progress-icon {
+    width: 9vmin;
+    height: 9vmin;
+    margin-bottom: 0.5vmin;
+    margin-right: -3vmin;
+    align-self: flex-end;
+    transform-origin: 30% 70%;
+    animation: progress-swing 1s infinite alternate ease-in-out;
 }
 
-.progress-text2 {
+.progress-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.2vmin;
+}
+
+.progress-bar {
+    position: relative;
+    width: 7vmin;
+    height: 28vmin;
+    border: 0.8vmin solid var(--progress-color);
+    border-radius: 1.5vmin;
+    background: rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.progress-fill {
     position: absolute;
-    top: -5vw; /* 根据视口宽度调整 */
-    left: 4.5vw; /* 根据视口宽度调整 */
-    color: #ffd280;
-    font-size: 2vw; /* 根据视口宽度调整 */
-    font-family: 'Arial', sans-serif;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, #a14f18, #e08a2c);
+    transition: height 1s ease-out;
+}
+
+.progress-count {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.5vmin;
+    text-align: center;
+    color: #fff;
+    font-size: 3vmin;
     font-weight: bold;
+    line-height: 1;
+    text-shadow: 0 0 0.5vmin rgba(0, 0, 0, 0.9);
 }
 
-.progressBar-fill {
-    position: absolute;
-    width: 100%;
-    background-color: #a14f18;
+.progress-count small {
+    display: block;
+    font-size: 1.8vmin;
+    opacity: 0.85;
 }
 
-.progress-svg {
-    position: absolute;
-    top: -6.5vw; /* Changed to rem, equivalent to -160px */
-    left: 60%;
-    height: 6vw; /* Changed to rem, equivalent to 150px */
-    width: 6vw; /* Changed to rem, equivalent to 150px */
-    animation: swing 1s infinite alternate;
-}
-
-.progress-text {
-    color: #ff4500;
-    font-size: 1.125rem; /* Changed to rem, equivalent to 18px */
-    font-family: 'Arial', sans-serif;
+.progress-label {
+    writing-mode: vertical-rl;
+    letter-spacing: 0.3em;
+    color: var(--progress-color);
+    font-size: 3.2vmin;
     font-weight: bold;
-    z-index: 1200;
+    text-shadow: 0 0 0.6vmin rgba(0, 0, 0, 0.8);
 }
 
-
-
-@keyframes swing {
-    0% {
-        transform: translateX(-60%) rotate(-6deg);
-    }
-
-    100% {
-        transform: translateX(-60%) rotate(6deg);
-    }
+@keyframes progress-swing {
+    from { transform: rotate(-6deg); }
+    to { transform: rotate(6deg); }
 }
 
 @keyframes fadeInAndGrow {
@@ -82,4 +97,3 @@
     animation: fadeInAndGrow 2s ease-in-out forwards;
     animation-delay: 1.5s;
 }
-

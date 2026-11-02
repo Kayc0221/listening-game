@@ -1,48 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import './ProgressBar.css'; // 確保你有一個 CSS 文件名為 ProgressBar.css
+import './ProgressBar.css';
 
 import { getPlayedGames } from '../api';
 import { asset } from '../asset';
-
-// 進度以「完成幾次冒險」計算：一次冒險 = 四個遊戲的所有關卡
-// (噪音峽谷 3 + 音速競技場 4 + 文字海 2 + ㄅㄅ森林 13)，全部共 36 次
-const LEVELS_PER_SESSION = 3 + 4 + 2 + 13;
-const TOTAL_SESSIONS = 36;
+import { useAuth } from '../contexts/AuthContext';
+import { LEVELS_PER_SESSION, TOTAL_SESSIONS, completedSessions } from '../progress';
 
 const ProgressBar = ({ username }) => {
-    const [progress, setProgress] = useState(0);
-    const totalGames = TOTAL_SESSIONS;
-
-    const fetchProgress = async () => {
-        try {
-            const data = await getPlayedGames(username);
-            const playedGames = data.playedGames || [];
-            setProgress(playedGames.length / LEVELS_PER_SESSION);
-        } catch (error) {
-            console.error('Error fetching played games:', error);
-        }
-    };
+    const [playedCount, setPlayedCount] = useState(0);
+    const { progressVersion } = useAuth(); // 每玩完一個遊戲會加一，觸發重新讀取
 
     useEffect(() => {
-        fetchProgress();
-    }, [username]);
+        let isMounted = true;
+        getPlayedGames(username)
+            .then((data) => { if (isMounted) setPlayedCount((data.playedGames || []).length); })
+            .catch((error) => console.error('Error fetching played games:', error));
+        return () => { isMounted = false; };
+    }, [username, progressVersion]);
 
-    const fillStyle = {
-        height: `${(progress / totalGames) * 100}%`, // 根據比例計算填充高度
-        bottom: '0', // 從底部開始填充
-    };
+    const sessions = Math.min(completedSessions(playedCount), TOTAL_SESSIONS);
+    // 填充高度用連續值，玩到一半的冒險也看得到一點進展
+    const fillPercent = Math.min(playedCount / (LEVELS_PER_SESSION * TOTAL_SESSIONS), 1) * 100;
 
     return (
-        <div className="progressBar-container fade-in-and-grow">
-            <span className="progress-text2">收集進度</span>
-            <img
-                src={asset('/image/progress.svg')} // 確保路徑正確
-                alt="Progress"
-                className="progress-svg"
-            />
-            <div className="progressBar-fill" style={fillStyle}></div>
-            <div className="progress-text">
-                {`${Math.round(progress)}/${totalGames}`}
+        <div className="progress-widget fade-in-and-grow">
+            <img src={asset('/image/progress.svg')} alt="" className="progress-icon" />
+            <div className="progress-body">
+                <div className="progress-bar" role="progressbar" aria-valuemin={0} aria-valuemax={TOTAL_SESSIONS} aria-valuenow={sessions} aria-label="收集進度">
+                    <div className="progress-fill" style={{ height: `${fillPercent}%` }} />
+                    <span className="progress-count">{sessions}<small>/{TOTAL_SESSIONS}</small></span>
+                </div>
+                <span className="progress-label">收集進度</span>
             </div>
         </div>
     );

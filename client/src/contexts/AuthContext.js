@@ -9,6 +9,8 @@ export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [background, setBackground] = useState(asset('/image/main-menu.png'));
     const [shownTips, setShownTips] = useState([]); // 新增 shownTips 狀態
+    const [progressVersion, setProgressVersion] = useState(0); // 改變時 ProgressBar 重新讀取進度
+    const refreshProgress = () => setProgressVersion((v) => v + 1);
 
     return (
         <AuthContext.Provider value={{
@@ -19,7 +21,9 @@ export const AuthProvider = ({ children }) => {
             background,
             setBackground,
             shownTips,
-            setShownTips
+            setShownTips,
+            progressVersion,
+            refreshProgress
         }}>
             {children}
         </AuthContext.Provider>
