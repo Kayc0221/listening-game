@@ -12,11 +12,27 @@ const root = path.join(__dirname, '..', '..');
 
 // ---- 假的試算表 ----
 const sheets = {};
+// 只實作 Code.gs 用到的部分；儲存格格式 (setNumberFormat) 在記憶體中沒有意義，直接忽略
 const makeSheet = (rows) => ({
   rows,
   getDataRange: () => ({ getValues: () => rows.map((r) => r.slice()) }),
+  getLastRow: () => rows.length,
   appendRow: (row) => { rows.push(row.slice()); },
-  getRange: (r, c) => ({ setValue: (v) => { rows[r - 1][c - 1] = v; } }),
+  getRange: (r, c) => {
+    const range = {
+      setNumberFormat: () => range,
+      setNumberFormats: () => range,
+      setValue: (v) => { rows[r - 1][c - 1] = v; return range; },
+      setValues: (values) => {
+        values.forEach((vals, i) => {
+          rows[r - 1 + i] = rows[r - 1 + i] || [];
+          vals.forEach((v, j) => { rows[r - 1 + i][c - 1 + j] = v; });
+        });
+        return range;
+      },
+    };
+    return range;
+  },
 });
 const addSheet = (name, headers, records = []) => {
   sheets[name] = makeSheet([headers, ...records.map((rec) => headers.map((h) => (rec[h] === undefined ? '' : rec[h])))]);

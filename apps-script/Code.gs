@@ -117,7 +117,7 @@ function updateScore_(username, scoreInfo) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
-    sheet_('scores').appendRow([new Date(), username, match[1], Number(match[2])]);
+    appendTextRow_('scores', [new Date(), username, match[1], Number(match[2])], ['yyyy-mm-dd hh:mm:ss', '@', '@', '0.##']);
   } finally {
     lock.releaseLock();
   }
@@ -130,6 +130,15 @@ function sheet_(name) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
   if (!sheet) throw httpError_(500, 'Missing sheet: ' + name);
   return sheet;
+}
+
+// 先設定儲存格格式再寫入：試算表會把 "4-1" 這種文字自動轉成日期 (4 月 1 日)
+// formats 用 '@' 表示純文字
+function appendTextRow_(name, row, formats) {
+  var sheet = sheet_(name);
+  var range = sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length);
+  range.setNumberFormats([formats]);
+  range.setValues([row]);
 }
 
 // 把工作表讀成物件陣列，key 是第一列的標題
@@ -179,7 +188,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('遊戲管理')
     .addItem('新增 / 重設學生帳號', 'promptAddUser')
-    .addItem('建立缺少的工作表', 'setupSheets')
+    .addItem('建立 / 修正工作表', 'setupSheets')
     .addToUi();
 }
 
@@ -198,22 +207,30 @@ function setUser_(username, password) {
   var values = sheet.getDataRange().getValues();
   for (var i = 1; i < values.length; i++) {
     if (String(values[i][0]) === username) {
-      sheet.getRange(i + 1, 2).setValue(sha256_(password));
+      sheet.getRange(i + 1, 2).setNumberFormat('@').setValue(sha256_(password));
       return;
     }
   }
-  sheet.appendRow([username, sha256_(password)]);
+  appendTextRow_('users', [username, sha256_(password)], ['@', '@']);
 }
 
+// 建立缺少的工作表，並把 ID 類的欄位設成純文字 (已存在的工作表也會套用)
 function setupSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var layout = {
-    users: ['username', 'password_sha256'],
-    questions: ['gameId', 'text', 'ans', 'voice'],
-    tips: ['index', 'class', 'tip'],
-    scores: ['timestamp', 'username', 'gameId', 'score'],
+    users: { headers: ['username', 'password_sha256'], textColumns: ['A', 'B'] },
+    questions: { headers: ['gameId', 'text', 'ans', 'voice'], textColumns: ['A', 'B', 'C', 'D'] },
+    tips: { headers: ['index', 'class', 'tip'], textColumns: ['B', 'C'] },
+    scores: { headers: ['timestamp', 'username', 'gameId', 'score'], textColumns: ['B', 'C'] },
   };
   Object.keys(layout).forEach(function (name) {
-    if (!ss.getSheetByName(name)) ss.insertSheet(name).appendRow(layout[name]);
+    var sheet = ss.getSheetByName(name);
+    if (!sheet) {
+      sheet = ss.insertSheet(name);
+      sheet.appendRow(layout[name].headers);
+    }
+    layout[name].textColumns.forEach(function (col) {
+      sheet.getRange(col + ':' + col).setNumberFormat('@');
+    });
   });
 }
