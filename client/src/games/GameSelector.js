@@ -4,6 +4,7 @@ import { useAudio } from '../contexts/AudioContext';
 
 import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
+import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
 import { ApiError, selectRandomGames } from '../api';
 
@@ -24,12 +25,7 @@ const GameSelector = ({ username }) => {
     const { pauseAudio, addAudio, playAudio,removeAudio } = useAudio();   
 
 
-    const gameNames = {
-        1: "噪音峽谷",
-        2: "音速競技場",
-        3: "ㄅㄅ森林",
-        4: "文字海"
-    };
+    const gameName = GAMES[selectedGame]?.name;
 
     const startGameAnimation = () => {
         //pauseAudio(0);
@@ -151,21 +147,21 @@ const GameSelector = ({ username }) => {
     function getMessageByRound(gameRounds) {
         switch (gameRounds) {
             case 0:
-                return "那我們今天就在 " + gameNames[selectedGame] + " 中開始我們的冒險吧";
+                return "那我們今天就在 " + gameName + " 中開始我們的冒險吧";
             case 1:
-                return "接下來就去 " + gameNames[selectedGame] + " 中尋找更多燃料吧！";
+                return "接下來就去 " + gameName + " 中尋找更多燃料吧！";
             case 2:
-                return "雷達上發現 " + gameNames[selectedGame] + " 中有燃料的反應！";
+                return "雷達上發現 " + gameName + " 中有燃料的反應！";
             case 3:
-                return "最後的挑戰是 " + gameNames[selectedGame] + " 努力堅持到最後吧！";
+                return "最後的挑戰是 " + gameName + " 努力堅持到最後吧！";
             case 4:
                 return "Hello, " + username + " 讓我們開始旅程吧!!"
             case 5:
-                return "恭喜你在 " + gameNames[selectedGame] + " 中找到了一些燃料！"
+                return "恭喜你在 " + gameName + " 中找到了一些燃料！"
             case 6:
                 return "看來努力是會有回報的 " + username + " 你表現得很好！"
             case 7:
-                return "沒想到在 " + gameNames[selectedGame] + " 中還有這麼多燃料！"
+                return "沒想到在 " + gameName + " 中還有這麼多燃料！"
             default:
                 return "繼續您的冒險！";
         }
@@ -217,7 +213,7 @@ const GameSelector = ({ username }) => {
                     <GameComponent
                         selectedGames={selectedGames}
                         username={username}
-                        gameName={gameNames[selectedGame]}
+                        gameType={selectedGame}
                         onGameEnd={handleGameEnd} 
                     />
                 </>
