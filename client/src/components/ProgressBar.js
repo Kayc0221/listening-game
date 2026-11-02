@@ -3,18 +3,20 @@ import './ProgressBar.css'; // 確保你有一個 CSS 文件名為 ProgressBar.c
 
 import { getPlayedGames } from '../api';
 
+// 進度以「完成幾次冒險」計算：一次冒險 = 四個遊戲的所有關卡
+// (噪音峽谷 3 + 音速競技場 4 + 文字海 2 + ㄅㄅ森林 13)，全部共 36 次
+const LEVELS_PER_SESSION = 3 + 4 + 2 + 13;
+const TOTAL_SESSIONS = 36;
+
 const ProgressBar = ({ username }) => {
     const [progress, setProgress] = useState(0);
-    const totalGames = 36; // 總遊戲數設為36
+    const totalGames = TOTAL_SESSIONS;
 
     const fetchProgress = async () => {
         try {
             const data = await getPlayedGames(username);
             const playedGames = data.playedGames || [];
-            console.log('playedGames:', playedGames);
-            const newProgress = (playedGames.length/(3+4+2+13)); // 直接使用已玩遊戲數
-            console.log('newProgress:', newProgress);
-            setProgress(newProgress);
+            setProgress(playedGames.length / LEVELS_PER_SESSION);
         } catch (error) {
             console.error('Error fetching played games:', error);
         }

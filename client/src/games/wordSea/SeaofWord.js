@@ -25,7 +25,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [isGameEnded, setIsGameEnded] = useState(false);
 
     const [callCount, setCallCount] = useState(0);
-    const [selectCount, setSelectCount] = useState(0);
 
     const [Difficulty, setDifficulty] = useState(0); // 假设默认值为 1
     const [ans, setAns] = useState('');
@@ -151,7 +150,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
             // 更新選擇集合
             setSelected(newSelected);
-            setSelectCount(newSelected.size);
 
             // 如果選擇的數量達到Difficulty，且尚未進行過結算，則進行結算
             if (newSelected.size === Difficulty && !hasCheckedChoices) {
@@ -160,12 +158,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             }
         };
 
-        const checkChoicesBtn = () => {
-            if (!hasCheckedChoices) {
-                setButtonClicked(false);
-                checkChoices(selected);
-            }
-        }
 
 
         const checkChoices = (newSelected) => {
@@ -220,7 +212,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         setCorrectChoices(new Set());
         setIncorrectChoices(new Set());
         setMissedChoices(new Set());
-        setSelectCount(0);
         setHasCheckedChoices(false);
         setAns('');
         setTarget('');

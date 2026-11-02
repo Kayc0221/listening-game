@@ -1,4 +1,4 @@
-﻿// BForest.jsx
+// BForest.jsx
 import React, { useState, useEffect } from 'react';
 import './BForest.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
@@ -7,7 +7,7 @@ import AudioVisualizer from '../../components/AudioVisualizer';
 import { useAudio } from '../../contexts/AudioContext';
 import ScoreStarsField from '../../components/ScoreStarsField';
 
-import { getAverageScore, submitScore } from '../../api';
+import { submitScore } from '../../api';
 import { translateZhuyinToCode } from './zhuyin';
 
 
@@ -37,7 +37,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [answerResult, setAnswerResult] = useState(null); // 'correct' 或 'incorrect'
     const [answerResult2, setAnswerResult2] = useState(null); // 'correct' 或 'incorrect'
 
-    const [Difficulty, setDifficulty] = useState(0); // 假设默认值为 1
     const [btnnameA1,setBtnnameA1] =useState('A1')
     const [btnnameB1,setBtnnameB1] =useState('B1')
     const [btnnameA2,setBtnnameA2] =useState('A2')
@@ -54,17 +53,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
 
-    const convertScoreToDifficulty = (score) => {
-        if (score >= 1 && score <= 2.5) {
-            return 1; 
-        } else if (score > 2.5 && score <= 5) {
-            return 2; 
-        } else if(score > 5 && score <= 7.5){
-            return 3; 
-        }else {
-            return 4; 
-        }
-    };
 
 
     const handleButtonClick = async (buttonType) => {
@@ -73,16 +61,13 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
 
         await pauseAudio(0);
-        console.log("Difficulty:", Difficulty);
 
         let Audio1_Idx;
 
         if (buttonType==='A') {
             Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][0])}.mp3`, false);
-            console.log("Start name:", choicedGamedata[1][0]);
         }else{
             Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][1])}.mp3`, false);
-            console.log("Start name:", choicedGamedata[1][1]);
         }
 
         setNewIndex1(Audio1_Idx);
@@ -191,17 +176,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     }, [choicedGamedata]);
     
 
-    useEffect(() => {
-        const fetchAndSetDifficulty = async () => {
-            // 获取平均分数
-            const averageScore = await getAverageScore(username);
-            const Difficulty = convertScoreToDifficulty(averageScore);
-            setDifficulty(Difficulty);
-        };
-
-        fetchAndSetDifficulty();
-    }, [hasCheckedChoices,choicedGamedata, username]); // 依赖项数组包含 hasCheckedChoices 和 username
-
     const checkChoices = (choice) => {
         if (!isRound2) {
             const score = choice === correctAnswer1 ? 5 : 0;
@@ -212,7 +186,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             } else {
                 setAnswerResult('incorrect');
             }
-            const timer = setTimeout(() => {setShowState(4);}, 3000);
+            setTimeout(() => {setShowState(4);}, 3000);
             setIsRound2(true);
             setHasCheckedChoices(true);
             setButtonClicked(false);

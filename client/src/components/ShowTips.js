@@ -6,7 +6,6 @@ import { getTip } from '../api';
 
 const ShowTips = ({ classValue, onClick }) => {
     const [tip, setTip] = useState('');
-    const [index, setIndex] = useState(null);
     const { addAudio, playAudio } = useAudio();
     const { shownTips, setShownTips } = useAuth(); // 使用 useAuth 來訪問和更新 shownTips
 
@@ -26,9 +25,6 @@ const ShowTips = ({ classValue, onClick }) => {
 
                 if (isMounted && data && !shownTips.includes(data.index)) {
                     setTip(data.tip);
-                    setIndex(data.index);
-                    console.log(data.tip);
-                    console.log(data.index);
                     if (data.index !== null) {
                         const tipsAudio = await addAudio(`tips/${data.index}.wav`, false);
                         await playAudio(tipsAudio);
@@ -36,7 +32,7 @@ const ShowTips = ({ classValue, onClick }) => {
                     }
                 }
             } catch (error) {
-                console.log("An error occurred:", error);
+                console.error("An error occurred:", error);
             }
         };
 

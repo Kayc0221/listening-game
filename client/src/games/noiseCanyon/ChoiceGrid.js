@@ -1,4 +1,4 @@
-﻿// ChoiceGrid.jsx
+// ChoiceGrid.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './ChoiceGrid.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
@@ -39,7 +39,6 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const convertScoreToSNR = (score) => {
         // 假设 10 分对应 -10，0 分对应 10
         const snr = -20 * (score / 10) + 10;
-        //console.log("Start SNR:", snr);
         return snr;
     };
 

@@ -1,4 +1,4 @@
-﻿// GameComponent.js — 一個遊戲的流程：說明頁 → 逐關遊玩 → 溝通小訣竅
+// GameComponent.js — 一個遊戲的流程：說明頁 → 逐關遊玩 → 溝通小訣竅
 import React, { useState, useEffect } from 'react';
 import { GAMES, TIP_CLASS } from './gameConfig';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,7 +23,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
                     setGameDatas(data);
                 }
             } catch (error) {
-                console.log("Failed to fetch game data:", error);
+                console.error("Failed to fetch game data:", error);
             }
         };
 

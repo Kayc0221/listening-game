@@ -1,4 +1,4 @@
-﻿// SpeedRun.jsx
+// SpeedRun.jsx
 import React, { useState, useEffect } from 'react';
 import './SpeedRun.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
@@ -52,7 +52,6 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
 
         await pauseAudio(0);
-        console.log("Start playbackRate:", playbackRate);
         
         const Audio1_Idx = await addAudio(`game2/${choicedGamedata[2]}-1.wav`, false);
         await playAudio(Audio1_Idx,playbackRate);
@@ -88,7 +87,6 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
         pauseAudio(0);
-        console.log("Start playbackRate:", playbackRate);
         
         const Audio2_Idx = await addAudio(`game2/${choicedGamedata[2]}-1.wav`, false);
         const Audio3_Idx = await addAudio(`game2/${choicedGamedata[2]}-2.wav`, false);

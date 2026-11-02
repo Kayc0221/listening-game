@@ -24,7 +24,6 @@ const App = () => {
     const handleLoginSuccess = async (username) => {
         let Audio1_Idx;
         Audio1_Idx = await addAudio(`background-music.mp3`, true, true);
-        console.log(Audio1_Idx);
         await playAudio(Audio1_Idx);
         setIsAuthenticated(true);
         setCurrentUser(username);

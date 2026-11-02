@@ -1,4 +1,4 @@
-﻿// BForest2.jsx
+// BForest2.jsx
 import React, { useState, useEffect } from 'react';
 import './BForest2.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
@@ -62,13 +62,11 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
 
         await pauseAudio(0);
-        console.log("Difficulty:", Difficulty);
 
         let Audio1_Idx;
 
         if (buttonType==='A') {
             Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][Difficulty])}.mp3`, false);
-            console.log("Start name:", choicedGamedata[1][Difficulty]);
         }
 
         setNewIndex1(Audio1_Idx);

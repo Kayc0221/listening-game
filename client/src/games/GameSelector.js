@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './GameSelector.css';
 import { useAudio } from '../contexts/AudioContext';
 
@@ -18,11 +18,10 @@ const GameSelector = ({ username }) => {
     const [finishAnimating, setfinishAnimating] = useState(false);
     const [canConfirm, setCanConfirm] = useState(false);
     const [showExpandedGame, setShowExpandedGame] = useState(false);
-    const [showImage, setShowImage] = useState(true);  // 控制图片的显示
     const [gameRounds, setGameRounds] = useState(0);
 
     const [availableGames, setAvailableGames] = useState([1, 2, 3, 4]);
-    const { pauseAudio, addAudio, playAudio,removeAudio } = useAudio();   
+    const { pauseAudio, removeAudio } = useAudio();
 
 
     const gameName = GAMES[selectedGame]?.name;
@@ -38,7 +37,6 @@ const GameSelector = ({ username }) => {
         removeAudio(0);
         setIsAuthenticated(false);
         setCurrentUser(null);
-        console.log("遊戲結束，返回登入畫面");
         setBackground(`/image/main-menu.png`);
     };
 
@@ -48,7 +46,7 @@ const GameSelector = ({ username }) => {
         try {
             data = await selectRandomGames(username, selectedGame);
         } catch (error) {
-            console.log("Failed to fetch random games:", error);
+            console.error("Failed to fetch random games:", error);
             if (error instanceof ApiError) {
                 window.alert("沒有更多遊戲可以玩了! 返回主選單!");
                 exitGame();
@@ -63,7 +61,7 @@ const GameSelector = ({ username }) => {
                 const additionalData = await selectRandomGames(username, 5);
                 setSelectedGames([...data.selectedGames, ...additionalData.selectedGames]);
             } catch (error) {
-                console.log("Failed to fetch games for gameType 5:", error);
+                console.error("Failed to fetch games for gameType 5:", error);
             }
         }
     };
@@ -72,7 +70,6 @@ const GameSelector = ({ username }) => {
 
     const handleGameEnd = () => {
         setShowExpandedGame(false);
-        //setShowImage(true); 
         if (gameRounds < 4) {
             setCanConfirm(false);
             setGameRounds(prevRounds => prevRounds + 1);
@@ -137,7 +134,6 @@ const GameSelector = ({ username }) => {
         if (showExpandedGame) {
             const timer = setTimeout(() => {
                 setBackground(`/image/game${selectedGame}.jpg`);
-                //setShowImage(false);  // 隐藏图片
             }, 3000);  // 假设动画时长为 3 秒
 
             return () => clearTimeout(timer);  // 清除定时器
@@ -205,11 +201,11 @@ const GameSelector = ({ username }) => {
             
             {showExpandedGame && gameRounds <4 && (
                 <>
-                    {showImage && <img
+                    <img
                         src={`/image/game${selectedGame}.jpg`}
                         alt={`Game Icon ${selectedGame}`}
                         className="game-icon-expanded"
-                    />}
+                    />
                     <GameComponent
                         selectedGames={selectedGames}
                         username={username}
@@ -220,13 +216,11 @@ const GameSelector = ({ username }) => {
             )}
             {gameRounds === 4 && (
                 <>
-                    {showImage && (
-                        <img
-                            src={`/image/End-round.png`}
-                            alt={`Game Icon ${selectedGame}`}
-                            className="game-icon-expanded"
-                        />
-                    )}
+                    <img
+                        src={`/image/End-round.png`}
+                        alt={`Game Icon ${selectedGame}`}
+                        className="game-icon-expanded"
+                    />
                     <div className="endgame-text-container">
                         <AnimatedTitle text={`「小怪獸成功在今天的冒險中找到了一些燃料，但還不足以發射火箭，還請同學多多幫忙小怪獸尋找燃料，讓他可以早日回家😄」`} />
                     </div>
@@ -238,13 +232,11 @@ const GameSelector = ({ username }) => {
 
             {gameRounds === 5 && (
                 <>
-                    {showImage && (
-                        <img
-                            src={`/image/endding.jpg`}
-                            alt={`Game Icon ${selectedGame}`}
-                            className="game-icon-expanded"
-                        />
-                    )}
+                    <img
+                        src={`/image/endding.jpg`}
+                        alt={`Game Icon ${selectedGame}`}
+                        className="game-icon-expanded"
+                    />
                     <div className="endgame-text-container">
                         <AnimatedTitle text={`「小怪獸的飛行器填充完燃料，可以踏上返家的旅程，也感謝同學一路來的幫助，在這幾週一起成長，遊戲雖然結束，但同學還是要把握機會繼續增進自己的能力😄」`} />
                     </div>

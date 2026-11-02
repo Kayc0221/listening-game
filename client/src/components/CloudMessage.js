@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './CloudMessage.css';
-import cloudImage from '../assets/cloud.png';
 import { useAudio } from '../contexts/AudioContext';
 import GameSelector from '../games/GameSelector'; // 確保導入 GameSelector 組件
 
 
 const CloudMessage = ({ currentUser }) => {
   const [showGameSelector, setShowGameSelector] = useState(false);
-  const { pauseAudio, addAudio, playAudio } = useAudio();
-  const [newIndex1, setNewIndex1] = useState(null);  // 新增這行
+  const { addAudio, playAudio } = useAudio();
 
   useEffect(() => {
     const timer = setTimeout(() => {
       const audioIndex = addAudio(`cloudMsg.mp3`);
-      setNewIndex1(audioIndex);
       playAudio(audioIndex);
     }, 2000); // 5000 毫秒後自動轉場
 
@@ -21,7 +18,6 @@ const CloudMessage = ({ currentUser }) => {
   }, []);
 
   if (showGameSelector) {
-    //pauseAudio(0);
     return <GameSelector username={currentUser} />;
   }
 
