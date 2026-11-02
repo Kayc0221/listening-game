@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useAudio } from './AudioContext';
-import { useAuth } from './AuthContext'; // 引入 useAuth
+import { useAudio } from '../contexts/AudioContext';
+import { useAuth } from '../contexts/AuthContext'; // 引入 useAuth
 import './ShowTips.css';  // 引入CSS文件
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 

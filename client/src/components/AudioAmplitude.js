@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAudio } from './AudioContext';
+import { useAudio } from '../contexts/AudioContext';
 
 const AudioAmplitude = ({ index }) => {
     const canvasRef = useRef(null);

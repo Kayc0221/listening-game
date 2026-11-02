@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './AuthContext';  // 引入 AuthProvider
-import { AudioProvider } from './AudioContext'; // 確保路徑正確
+import { AuthProvider } from './contexts/AuthContext';  // 引入 AuthProvider
+import { AudioProvider } from './contexts/AudioContext'; // 確保路徑正確
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

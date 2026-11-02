@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './CloudMessage.css';
-import cloudImage from './cloud.png';
-import { useAudio } from './AudioContext';
-import GameSelector from './GameSelector'; // 確保導入 GameSelector 組件
+import cloudImage from '../assets/cloud.png';
+import { useAudio } from '../contexts/AudioContext';
+import GameSelector from '../games/GameSelector'; // 確保導入 GameSelector 組件
 
 
 const CloudMessage = ({ currentUser }) => {

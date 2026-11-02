@@ -109,14 +109,14 @@
     }
 
 .start-button {
-    background-image: url('../public/image/icon/start-game.png');
+    background-image: url('../../public/image/icon/start-game.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .exit-button {
-    background-image: url('../public/image/icon/exit-game.png');
+    background-image: url('../../public/image/icon/exit-game.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

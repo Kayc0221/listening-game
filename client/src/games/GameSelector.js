@@ -1,10 +1,10 @@
 ﻿import React, { useState, useEffect } from 'react';
 import './GameSelector.css';
-import { useAudio } from './AudioContext';
+import { useAudio } from '../contexts/AudioContext';
 
-import { useAuth } from './AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
-import AnimatedTitle from './AnimatedTitle';
+import AnimatedTitle from '../components/AnimatedTitle';
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 
 

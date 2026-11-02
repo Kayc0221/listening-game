@@ -1,17 +1,17 @@
 /* eslint-disable jsx-a11y/alt-text */
 //app.js
 import React, { useState, useEffect } from 'react';
-import { useAuth} from './AuthContext';
-import logo from './new-logo.png';
+import { useAuth} from './contexts/AuthContext';
+import logo from './assets/new-logo.png';
 import './App.css';  // 引入CSS文件
-import Login from './Login';  // 引入 Login 組件
-import VolumeControl from './VolumeControl';  // 引入 AudioPlayer 組件
-import ShootingStars from './ShootingStars';
-import ProgressBar from './ProgressBar';
-import CursorTail from './CursorTail';
-import { useAudio } from './AudioContext';
+import Login from './components/Login';  // 引入 Login 組件
+import VolumeControl from './components/VolumeControl';  // 引入 AudioPlayer 組件
+import ShootingStars from './components/ShootingStars';
+import ProgressBar from './components/ProgressBar';
+import CursorTail from './components/CursorTail';
+import { useAudio } from './contexts/AudioContext';
 
-import CloudMessage from './CloudMessage'; // 確保路徑正確
+import CloudMessage from './components/CloudMessage'; // 確保路徑正確
 
 const App = () => {
     const { addAudio, playAudio } = useAudio();

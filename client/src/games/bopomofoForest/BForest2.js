@@ -1,11 +1,11 @@
 ﻿// BForest2.jsx
 import React, { useState, useEffect } from 'react';
 import './BForest2.css'; // 引入外部 CSS
-import AnimatedTitle from './AnimatedTitle';
-import AudioAmplitude from './AudioAmplitude';
-import AudioVisualizer from './AudioVisualizer';
-import { useAudio } from './AudioContext';
-import ScoreStarsField from './ScoreStarsField';
+import AnimatedTitle from '../../components/AnimatedTitle';
+import AudioAmplitude from '../../components/AudioAmplitude';
+import AudioVisualizer from '../../components/AudioVisualizer';
+import { useAudio } from '../../contexts/AudioContext';
+import ScoreStarsField from '../../components/ScoreStarsField';
 
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 

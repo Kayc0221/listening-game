@@ -1,6 +1,6 @@
 ﻿import React, { useState } from 'react';
 import './VolumeControl.css';
-import { useAudio } from './AudioContext';
+import { useAudio } from '../contexts/AudioContext';
 
 const VolumeControl = () => {
     const { setAudioVolume, volume, pauseAudio, playAudio, isPlaying } = useAudio();

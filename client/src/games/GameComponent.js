@@ -1,13 +1,13 @@
 ﻿// GameComponent.jsx
 import React, { useState, useEffect } from 'react';
-import ChoiceGrid from './ChoiceGrid';
-import { useAuth } from './AuthContext';
+import ChoiceGrid from './noiseCanyon/ChoiceGrid';
+import { useAuth } from '../contexts/AuthContext';
 import './GameComponent.css';
-import ShowTips from './ShowTips';
-import SpeedRun from './SpeedRun';
-import SeaofWord from './SeaofWord';
-import BForest from './BForest';
-import BForest2 from './BForest2';
+import ShowTips from '../components/ShowTips';
+import SpeedRun from './speedArena/SpeedRun';
+import SeaofWord from './wordSea/SeaofWord';
+import BForest from './bopomofoForest/BForest';
+import BForest2 from './bopomofoForest/BForest2';
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 
 const Game1Component = ({ selectedGames, username, gameName, onGameEnd }) => {
