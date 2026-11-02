@@ -14,8 +14,14 @@ export const useAudio = () => {
 export const AudioProvider = ({ children }) => {
     const audioSources = useRef([]);
     const [volume, setVolume] = useState(0.5);
-    const audioContext = useRef(new (window.AudioContext || window.webkitAudioContext)());
-    const analyser = useRef(audioContext.current.createAnalyser());
+    const audioContext = useRef(null);
+    const analyser = useRef(null);
+    // 只建立一次 AudioContext (useRef 的初始值每次 render 都會被重新計算)
+    if (!audioContext.current) {
+        audioContext.current = new (window.AudioContext || window.webkitAudioContext)();
+        analyser.current = audioContext.current.createAnalyser();
+        analyser.current.connect(audioContext.current.destination);
+    }
 
     const wakeAudioContext = async () => {
         if (audioContext.current.state === 'suspended') {
@@ -34,13 +40,13 @@ export const AudioProvider = ({ children }) => {
             newAudio.buffer = mixedAudioBuffer;
             newAudio.loop = shouldLoop;
 
+            // 經過 gainNode 再接到 analyser，音量才會受音量控制影響
             const gainNode = audioContext.current.createGain();
             gainNode.gain.value = volume;
             newAudio.connect(gainNode);
-            gainNode.connect(audioContext.current.destination);
 
             newAudio.gainNode = gainNode;
-            source = newAudio;
+            source = gainNode;
         } else {
             // 使用 URL
             const fullPath = `/audio/${src}`;
@@ -51,18 +57,11 @@ export const AudioProvider = ({ children }) => {
         }
 
         source.connect(analyser.current);
-        analyser.current.connect(audioContext.current.destination);
 
-        if (!shouldLoop && !mixedAudioBuffer) {
-            newAudio.addEventListener('ended', () => {
-                console.log(`Audio at index ${audioSources.current.length - 1} has ended.`);
-                removeAudio(audioSources.current.length - 1);
-            });
-        } else if (mixedAudioBuffer) {
-            newAudio.addEventListener('ended', () => {
-                console.log(`Buffered audio at index ${audioSources.current.length - 1} has ended.`);
-                removeAudio(audioSources.current.length - 1);
-            });
+        // 播完後移除「這個」音訊 (之前用陣列最後一個索引，播完時可能已經不是它)
+        const index = audioSources.current.length;
+        if (!shouldLoop || mixedAudioBuffer) {
+            newAudio.addEventListener('ended', () => removeAudio(index));
         }
 
         newAudio.isBackground = isBackground;

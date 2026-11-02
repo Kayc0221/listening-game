@@ -29,7 +29,16 @@ async function fetchAudioBuffer(audioContext, filename) {
 }
 
 export async function createMixedAudio(signalFilename, noiseFilename, SNR) {
+    // 只用來解碼與建立 buffer；用完要關閉，否則每播一次就多一個沒釋放的 AudioContext
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    try {
+        return await mixAtSNR(audioContext, signalFilename, noiseFilename, SNR);
+    } finally {
+        audioContext.close();
+    }
+}
+
+async function mixAtSNR(audioContext, signalFilename, noiseFilename, SNR) {
     const signalBuffer = await fetchAudioBuffer(audioContext, signalFilename);
     const noiseBuffer = await fetchAudioBuffer(audioContext, noiseFilename);
 
