@@ -9,6 +9,7 @@ import ScoreStarsField from '../../components/ScoreStarsField';
 
 import { submitScore } from '../../api';
 import { translateZhuyinToCode } from './zhuyin';
+import { asset } from '../../asset';
 
 
 const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
@@ -317,7 +318,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                         onClick={startNewRound}  // 為整個 div 添加 onClick 事件
                     >
                             {"正確的答案是 :「 "}{choicedGamedata[1][0]}{" 」"}{"以及:「 "}{choicedGamedata[1][1]}{" 」"}<br />{"你答對了嗎?"}
-                            <img src="/image/icon/next.png" alt="Next" className="next-icon" />
+                            <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
                         </div>   
                 </div>
             }

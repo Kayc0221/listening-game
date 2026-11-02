@@ -7,6 +7,7 @@ import GameComponent from './GameComponent';
 import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
 import { ApiError, selectRandomGames } from '../api';
+import { asset } from '../asset';
 
 
 const GameSelector = ({ username }) => {
@@ -37,7 +38,7 @@ const GameSelector = ({ username }) => {
         removeAudio(0);
         setIsAuthenticated(false);
         setCurrentUser(null);
-        setBackground(`/image/main-menu.png`);
+        setBackground(asset(`/image/main-menu.png`));
     };
 
     const fetchRandomGames = async () => {
@@ -82,7 +83,7 @@ const GameSelector = ({ username }) => {
 
     useEffect(() => {
         if (gameRounds === 4) {
-            setBackground(`/image/hint.jpg`);
+            setBackground(asset(`/image/hint.jpg`));
         }
     }, [gameRounds]);  // 當 canConfirm 或 hasFetched 變化時觸發
 
@@ -133,7 +134,7 @@ const GameSelector = ({ username }) => {
     useEffect(() => {
         if (showExpandedGame) {
             const timer = setTimeout(() => {
-                setBackground(`/image/game${selectedGame}.jpg`);
+                setBackground(asset(`/image/game${selectedGame}.jpg`));
             }, 3000);  // 假设动画时长为 3 秒
 
             return () => clearTimeout(timer);  // 清除定时器
@@ -171,12 +172,12 @@ const GameSelector = ({ username }) => {
                 <>
                     <div className="game-icons-container fade-in-and-grow">
                         <div className="game-row">
-                            <img src="/image/game1.jpg" alt="Game Icon 1" className={`game-icon ${selectedGame === 1 ? 'highlight' : ''} ${!availableGames.includes(1) ? 'disabled' : ''}`} />
-                            <img src="/image/game2.jpg" alt="Game Icon 2" className={`game-icon ${selectedGame === 2 ? 'highlight' : ''} ${!availableGames.includes(2) ? 'disabled' : ''}`} />
+                            <img src={asset('/image/game1.jpg')} alt="Game Icon 1" className={`game-icon ${selectedGame === 1 ? 'highlight' : ''} ${!availableGames.includes(1) ? 'disabled' : ''}`} />
+                            <img src={asset('/image/game2.jpg')} alt="Game Icon 2" className={`game-icon ${selectedGame === 2 ? 'highlight' : ''} ${!availableGames.includes(2) ? 'disabled' : ''}`} />
                         </div>
                         <div className="game-row">
-                            <img src="/image/game3.jpg" alt="Game Icon 3" className={`game-icon ${selectedGame === 3 ? 'highlight' : ''} ${!availableGames.includes(3) ? 'disabled' : ''}`} />
-                            <img src="/image/game4.jpg" alt="Game Icon 4" className={`game-icon ${selectedGame === 4 ? 'highlight' : ''} ${!availableGames.includes(4) ? 'disabled' : ''}`} />
+                            <img src={asset('/image/game3.jpg')} alt="Game Icon 3" className={`game-icon ${selectedGame === 3 ? 'highlight' : ''} ${!availableGames.includes(3) ? 'disabled' : ''}`} />
+                            <img src={asset('/image/game4.jpg')} alt="Game Icon 4" className={`game-icon ${selectedGame === 4 ? 'highlight' : ''} ${!availableGames.includes(4) ? 'disabled' : ''}`} />
                         </div>
                     </div>
                     <div className="controls">
@@ -202,7 +203,7 @@ const GameSelector = ({ username }) => {
             {showExpandedGame && gameRounds <4 && (
                 <>
                     <img
-                        src={`/image/game${selectedGame}.jpg`}
+                        src={asset(`/image/game${selectedGame}.jpg`)}
                         alt={`Game Icon ${selectedGame}`}
                         className="game-icon-expanded"
                     />
@@ -217,7 +218,7 @@ const GameSelector = ({ username }) => {
             {gameRounds === 4 && (
                 <>
                     <img
-                        src={`/image/End-round.png`}
+                        src={asset(`/image/End-round.png`)}
                         alt={`Game Icon ${selectedGame}`}
                         className="game-icon-expanded"
                     />
@@ -233,7 +234,7 @@ const GameSelector = ({ username }) => {
             {gameRounds === 5 && (
                 <>
                     <img
-                        src={`/image/endding.jpg`}
+                        src={asset(`/image/endding.jpg`)}
                         alt={`Game Icon ${selectedGame}`}
                         className="game-icon-expanded"
                     />

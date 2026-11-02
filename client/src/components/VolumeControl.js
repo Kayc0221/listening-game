@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './VolumeControl.css';
 import { useAudio } from '../contexts/AudioContext';
+import { asset } from '../asset';
 
 const VolumeControl = () => {
     const { setAudioVolume, volume, pauseAudio, playAudio } = useAudio();
@@ -27,13 +28,13 @@ const VolumeControl = () => {
 
     let volumeIconSrc;
     if (volume < 0.01) {
-        volumeIconSrc = '/image/icon/volume-mute.png';
+        volumeIconSrc = asset('/image/icon/volume-mute.png');
     } else if (volume < 0.5) {
-        volumeIconSrc = '/image/icon/volume-low.png';
+        volumeIconSrc = asset('/image/icon/volume-low.png');
     } else if (volume < 1) {
-        volumeIconSrc = '/image/icon/volume-medium.png';
+        volumeIconSrc = asset('/image/icon/volume-medium.png');
     } else {
-        volumeIconSrc = '/image/icon/volume-high.png';
+        volumeIconSrc = asset('/image/icon/volume-high.png');
     }
 
     return (

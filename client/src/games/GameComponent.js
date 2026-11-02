@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import './GameComponent.css';
 import ShowTips from '../components/ShowTips';
 import { getGameData } from '../api';
+import { asset } from '../asset';
 
 const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
     const [currentLevel, setCurrentLevel] = useState(0);  // 目前的遊戲關卡
@@ -41,7 +42,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
         }
         else {
             setShowExpandedTips(true);
-            setBackground(`/image/tips-background.jpg`);
+            setBackground(asset(`/image/tips-background.jpg`));
         }
     };
 
@@ -73,7 +74,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
                             <div className="description-container">
                                 <p className="description-text">{game.description}</p>
                                 <button className="start-game-button" onClick={() => setIsGameStarted(true)}>
-                                    <img src="/image/icon/next.png" alt="Next" className="next-icon" />
+                                    <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
                                 </button>
                             </div>
                         </>
@@ -83,7 +84,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
             {showExpandedTips && (
                 <>
                     <img
-                        src={`/image/tips-background.jpg`}
+                        src={asset(`/image/tips-background.jpg`)}
                         alt={`Tips Icon`}
                         className="game-icon-expanded"
                     />

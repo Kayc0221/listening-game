@@ -7,6 +7,7 @@ import AudioVisualizer from '../../components/AudioVisualizer';
 import { useAudio } from '../../contexts/AudioContext';
 import ScoreStarsField from '../../components/ScoreStarsField';
 import { getAverageScore, submitScore } from '../../api';
+import { asset } from '../../asset';
 
 
 
@@ -251,7 +252,7 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                         onClick={startNewRound}  // 為整個 div 添加 onClick 事件
                     >
                             {"正確的答案是 :「 "}{choicedGamedata[1]}{" 」"}<br />{"你答對了嗎?調整難度再聽一次吧! "}
-                            <img src="/image/icon/next.png" alt="Next" className="next-icon" />
+                            <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
                         </div>   
 
                         <div className="snr-controls">

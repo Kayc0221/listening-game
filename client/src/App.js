@@ -12,6 +12,7 @@ import CursorTail from './components/CursorTail';
 import { useAudio } from './contexts/AudioContext';
 
 import CloudMessage from './components/CloudMessage'; // 確保路徑正確
+import { asset } from './asset';
 
 const App = () => {
     const { addAudio, playAudio } = useAudio();
@@ -63,7 +64,7 @@ const App = () => {
                     <div>
                         <ProgressBar username={currentUser} />
                         <div className={`user-profile fade-in-and-grow`}>
-                            <img src="/image/icon/profile-user.png" className="user-profile-png" />
+                            <img src={asset('/image/icon/profile-user.png')} className="user-profile-png" />
                             <span className="user-profile-text">{currentUser}</span>
                         </div>
                         <CloudMessage currentUser={currentUser} />

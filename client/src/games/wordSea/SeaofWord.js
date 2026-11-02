@@ -6,6 +6,7 @@ import AudioAmplitude from '../../components/AudioAmplitude';
 import { useAudio } from '../../contexts/AudioContext';
 import ScoreStarsField from '../../components/ScoreStarsField';
 import { getAverageScore, submitScore } from '../../api';
+import { asset } from '../../asset';
 
 
 const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
@@ -308,7 +309,7 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                                 "答案不太正確喔，再聽一次，加油！" :
                                 <div onClick={startNewRound}>
                                     <p>正確答案: 「{addCommasToChinese(ans)}」你答對了嗎?</p>
-                                    <img src="/image/icon/next.png" alt="Next" className="next-icon" />
+                                    <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
                                 </div>
                             }
                         </div>   

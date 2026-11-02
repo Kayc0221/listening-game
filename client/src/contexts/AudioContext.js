@@ -1,5 +1,6 @@
 // AudioContext.js
 import React, { createContext, useContext, useState, useRef } from 'react';
+import { asset } from '../asset';
 
 const AudioContext = createContext();
 
@@ -49,7 +50,7 @@ export const AudioProvider = ({ children }) => {
             source = gainNode;
         } else {
             // 使用 URL
-            const fullPath = `/audio/${src}`;
+            const fullPath = asset(`/audio/${src}`);
             newAudio = new Audio(fullPath);
             newAudio.loop = shouldLoop;
             newAudio.volume = volume; // 使用相同的音量

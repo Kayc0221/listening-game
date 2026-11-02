@@ -1,12 +1,13 @@
 // AuthContext.js
 import React, { createContext, useState, useContext } from 'react';
+import { asset } from '../asset';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-    const [background, setBackground] = useState('../image/main-menu.png');
+    const [background, setBackground] = useState(asset('/image/main-menu.png'));
     const [shownTips, setShownTips] = useState([]); // 新增 shownTips 狀態
 
     return (

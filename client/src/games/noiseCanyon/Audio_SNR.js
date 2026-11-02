@@ -1,5 +1,6 @@
+import { asset } from '../../asset';
 async function fetchAudioBuffer(audioContext, filename) {
-    const url = `/audio/game1/${filename}`;
+    const url = asset(`/audio/game1/${filename}`);
     let response;
     try {
         response = await fetch(url);

@@ -1,0 +1,53 @@
+# 推到 main / master 時，建置 client 並部署到 GitHub Pages
+# 需要先在 repo 設定：
+#   Settings → Pages → Source 選「GitHub Actions」
+#   Settings → Secrets and variables → Actions → Variables 新增 REACT_APP_API_URL (Apps Script 網頁應用程式網址)
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+        working-directory: client
+      - run: npm run build
+        working-directory: client
+        env:
+          # 專案網站在 https://<帳號>.github.io/<repo>/；若 repo 名稱是 <帳號>.github.io，改成空字串
+          PUBLIC_URL: /${{ github.event.repository.name }}
+          REACT_APP_API_URL: ${{ vars.REACT_APP_API_URL }}
+          # CRA 在 CI=true 時會把 lint 警告當成錯誤
+          CI: false
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: client/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
