@@ -1,0 +1,144 @@
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+    animation-delay: 1.5s;
+}
+
+.game-icons-container {
+    flex-direction: column;
+}
+
+.game-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.game-icon {
+    margin: 20px;
+    flex-basis: calc(50% - 40px);
+    width: 17.5vw; /* 更改此行 */
+    height: auto;
+}
+
+.highlight {
+    border: 3px white;
+    box-shadow: 0px 0px 10px 5px white;
+}
+
+.outer-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+}
+
+.controls {
+    position: absolute; /* 或者 relative */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+
+.game-icon-expanded {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%; /* 設定初值 */
+    left: 50%; /* 設定初值 */
+    transform: translate(-50%, -50%); /* 將圖片置中 */
+    animation: expandImage 1s forwards;
+}
+
+@keyframes expandImage {
+    to {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        transform: none; /* 清除 transform */
+    }
+}
+
+
+.button-container {
+    position: absolute;
+    right: 11.7vw;
+    bottom: 13.9vh;
+    display: flex;
+    flex-direction: column;
+    gap: 60px;
+}
+
+.game-button {
+    z-index: 50;
+    width: 13.7vw;
+    height: 11.1vh;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+    .game-button:hover {
+        transform: scale(1.2);
+    }
+
+    .game-button:active {
+        transform: scale(0.9);
+    }
+
+.start-button {
+    background-image: url('../public/image/icon/start-game.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.exit-button {
+    background-image: url('../public/image/icon/exit-game.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.text-container {
+    position: absolute;
+    bottom: 15vh; /* 調整這個值來更改距離底部的位置 */
+    left: 50%;
+    transform: translate(-50%, 0);
+    color: white;
+    font-size: 1.3rem;
+    text-align: center;
+}
+.endgame-text-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80vw;
+    z-index: 2000;
+}
+
+.game-icon.disabled {
+    filter: grayscale(100%);
+}

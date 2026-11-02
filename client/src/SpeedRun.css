@@ -1,0 +1,204 @@
+
+
+.game2-container {
+    position: relative; /* 改為 relative 以容納子元素 */
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+    min-width: 60vw;
+    height: 40vh; /* 設定高度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+.grid-item:hover {
+    transform: scale(1.1); /* 将按钮放大 10% */
+    transition: transform 0.2s ease; /* 添加过渡效果，持续时间为0.2秒，使用缓动函数"ease" */
+}
+
+
+.grid-container2,
+.game-end-section2 {
+    position: absolute; /* 使用絕對定位來固定位置 */
+    width: 100%; /* 讓其橫向充滿父容器 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-stars-field {
+    margin: 20px;
+}
+
+
+
+
+.game-end-section2 {
+    font-size :64px;
+
+}
+
+.game-end-section2 {
+    font-size: 2vw;
+    color: white; /* 移除單引號 */
+    text-shadow: 2px 2px 4px black; /* 使用短橫線和移除單引號 */
+    position: absolute; /* 新增：定位屬性 */
+    top: 120%; /* 這裡設定為父容器高度的 160% */
+    margin: 10px;
+}
+
+.game-end-message2 {
+    font-size: 2.5vw;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+    cursor: pointer;
+}
+
+.score-stars-field {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.grid-container2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* 设置元素间的间距 */
+    top: 90%;
+}
+
+.grid-container2 button {
+    width: 4vw; /* 使用视口宽度的百分比 */
+    height: 4vw; /* 保持宽高一致 */
+    min-width: 40px; /* 设置最小宽度 */
+    min-height: 40px; /* 设置最小高度 */
+    border-radius: 50%; /* 圆形按钮 */
+    background-color: rgb(89, 95, 100); /* 按钮背景颜色 */
+    color: white; /* 文本颜色 */
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem; /* 文本大小 */
+    transition: transform 0.3s ease; /* 过渡动画 */
+}
+
+.grid-container2 button:hover {
+    transform: scale(1.1); /* 鼠标悬停时放大按钮 */
+}
+
+.grid-item-content2 {
+    position: relative;
+}
+.tick,
+.cross,
+.missed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 74px; /* 調整為你需要的大小 */
+}
+
+
+
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+}
+
+.delayed-fade-in {
+    animation: fadeIn 2s ease-in forwards;
+    animation-delay: 8s; /* 和AnimatedTitle的動畫時間一致 */
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+
+
+/* 调整文本和难度标签的样式 */
+.snr-label-container {
+    text-align: center; /* 文本居中 */
+    margin-bottom: 8px; /* 与滑动条的间距 */
+}
+
+.snr-instruction-text {
+    font-size: 20px; /* 字体大小 */
+    font-weight: bold; /* 加粗字体 */
+    color: white; /* 字体颜色为白色 */
+    display: block; /* 使其独占一行 */
+}
+
+/* 滑动条样式 */
+.snr-slider-container input[type="range"] {
+    -webkit-appearance: none; /* 移除默认样式 */
+    appearance: none;
+    width: 100%; /* 滑动条宽度 */
+    height: 10px; /* 滑动条高度 */
+    background: #ddd; /* 背景颜色 */
+    outline: none; /* 移除轮廓 */
+    opacity: 0.7; /* 透明度 */
+    -webkit-transition: .2s; /* 过渡效果 */
+    transition: opacity .2s;
+    margin: 10px 0; /* 上下间距 */
+}
+
+    /* 滑动条滑块（thumb）样式 */
+    .snr-slider-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; /* 移除默认样式 */
+        appearance: none;
+        width: 25px; /* 滑块宽度 */
+        height: 25px; /* 滑块高度 */
+        background: #4CAF50; /* 滑块颜色 */
+        cursor: pointer; /* 鼠标指针变成手指形状 */
+        border-radius: 50%; /* 圆形滑块 */
+    }
+
+    .snr-slider-container input[type="range"]::-moz-range-thumb {
+        width: 25px; /* 滑块宽度 */
+        height: 25px; /* 滑块高度 */
+        background: #4CAF50; /* 滑块颜色 */
+        cursor: pointer; /* 鼠标指针变成手指形状 */
+        border-radius: 50%; /* 圆形滑块 */
+    }
+
+/* 难度标签样式 */
+.snr-difficulty-label {
+    font-size: 2vw; /* 增大字体大小 */
+    font-weight: bold; /* 加粗字体 */
+    color: white; /* 字体颜色为白色 */
+    display: inline; /* 行内显示 */
+    margin-top: 12px; /* 与滑动条的间距 */
+}
+
+
+.prompt-top-right {
+    position: absolute;
+    top: -40%;  
+    right: 14%; 
+    font-weight: bold;
+    font-size: 2vw;
+    color: #ffffff;
+}
+
+

@@ -1,0 +1,49 @@
+import React, { useEffect, useState } from 'react';
+import './ProgressBar.css'; // 確保你有一個 CSS 文件名為 ProgressBar.css
+
+const apiBaseUrl = process.env.REACT_APP_API_URL;
+
+const ProgressBar = ({ username }) => {
+    const [progress, setProgress] = useState(0);
+    const totalGames = 36; // 總遊戲數設為36
+
+    const fetchProgress = async () => {
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/getPlayedGames?username=${username}`);
+            const data = await response.json();
+            const playedGames = data.playedGames || [];
+            console.log('playedGames:', playedGames);
+            const newProgress = (playedGames.length/(3+4+2+13)); // 直接使用已玩遊戲數
+            console.log('newProgress:', newProgress);
+            setProgress(newProgress);
+        } catch (error) {
+            console.error('Error fetching played games:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProgress();
+    }, [username]);
+
+    const fillStyle = {
+        height: `${(progress / totalGames) * 100}%`, // 根據比例計算填充高度
+        bottom: '0', // 從底部開始填充
+    };
+
+    return (
+        <div className="progressBar-container fade-in-and-grow">
+            <span className="progress-text2">收集進度</span>
+            <img
+                src="/image/progress.svg" // 確保路徑正確
+                alt="Progress"
+                className="progress-svg"
+            />
+            <div className="progressBar-fill" style={fillStyle}></div>
+            <div className="progress-text">
+                {`${Math.round(progress)}/${totalGames}`}
+            </div>
+        </div>
+    );
+};
+
+export default ProgressBar;

@@ -1,0 +1,85 @@
+.progressBar-container {
+    position: absolute;
+    top: 10vw; /* 根据视口宽度调整 */
+    left: 10vh; /* 根据视口高度调整 */
+    height: 12vw; /* 根据视口宽度调整 */
+    width: 7vh; /* 根据视口高度调整 */
+    border: 0.5rem solid #ffd280;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
+}
+
+.progress-svg {
+    position: absolute;
+    top: -5vw; /* 根据视口宽度调整 */
+    left: 60%; /* 使用百分比 */
+    height: 10vw; /* 根据视口宽度调整 */
+    width: 10vw; /* 根据视口宽度调整 */
+    animation: swing 1s infinite alternate;
+}
+
+.progress-text2 {
+    position: absolute;
+    top: -5vw; /* 根据视口宽度调整 */
+    left: 4.5vw; /* 根据视口宽度调整 */
+    color: #ffd280;
+    font-size: 2vw; /* 根据视口宽度调整 */
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+.progressBar-fill {
+    position: absolute;
+    width: 100%;
+    background-color: #a14f18;
+}
+
+.progress-svg {
+    position: absolute;
+    top: -6.5vw; /* Changed to rem, equivalent to -160px */
+    left: 60%;
+    height: 6vw; /* Changed to rem, equivalent to 150px */
+    width: 6vw; /* Changed to rem, equivalent to 150px */
+    animation: swing 1s infinite alternate;
+}
+
+.progress-text {
+    color: #ff4500;
+    font-size: 1.125rem; /* Changed to rem, equivalent to 18px */
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+    z-index: 1200;
+}
+
+
+
+@keyframes swing {
+    0% {
+        transform: translateX(-60%) rotate(-6deg);
+    }
+
+    100% {
+        transform: translateX(-60%) rotate(6deg);
+    }
+}
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+    animation-delay: 1.5s;
+}
+

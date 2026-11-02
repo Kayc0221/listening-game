@@ -1,0 +1,38 @@
+.show-tips-container {
+    background-color: rgba(81, 79, 79, 0.58);
+    color: rgb(255, 255, 255);
+    border: 1px solid black;
+    font-size: 3vw; /* 使用视窗宽度的百分比来适应不同屏幕尺寸 */
+    padding: 2vw; /* 同上，使内边距相对于视窗宽度调整 */
+    position: fixed; /* 改为fixed以相对于视窗进行定位，或保留relative根据需要 */
+    transform: translate(-50%, -90%); /* 正确居中 */
+    opacity: 0.9;
+    width: 60vw; /* 视窗宽度的60% */
+    height: 45vh; /* 视窗高度的45% */
+    border-radius: 5vw; /* 使用视窗宽度的百分比来定义圆角，根据需要调整 */
+    cursor: pointer;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字陰影增加清晰度 */
+    font-weight: bold; /* 字體加粗 */
+}
+
+.show-tips-container p {
+    padding: 1vw; /* 根据视窗宽度调整内边距 */
+}
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+    animation-delay: 0.5s;
+}

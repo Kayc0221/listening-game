@@ -1,0 +1,50 @@
+#cursorTailContainer {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+}
+
+.tail {
+    clip-path: polygon( 50% 0%, /* 頂部中間點 */
+    61% 35%, /* 右上角第一點 */
+    98% 35%, /* 右上角第二點 */
+    68% 57%, /* 右邊中間點 */
+    79% 91%, /* 右下角點 */
+    50% 70%, /* 底部中間點 */
+    21% 91%, /* 左下角點 */
+    32% 57%, /* 左邊中間點 */
+    2% 35%, /* 左上角第二點 */
+    39% 35% /* 左上角第一點 */
+    );
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: #faf5aa; /* 或您喜歡的任何顏色 */
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    animation: blink 1.5s infinite; /* 1s 是閃爍的速度，可以根據需要調整 */
+    box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.6); /* 這裡添加了光暈效果 */
+}
+
+    .tail:nth-child(n) {
+        transform: scale(calc(2.1 - 0.1 * n));
+        opacity: calc(1 - 0.05 * n);
+        animation-delay: calc(1s * n);
+    }
+
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    /* 更亮 */
+    50% {
+        opacity: 0.2;
+    }
+    /* 更暗 */
+}
+

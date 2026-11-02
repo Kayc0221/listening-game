@@ -1,0 +1,55 @@
+.cloud-container {
+  position: fixed;
+  top: 15%;
+  left: 15%;
+  width: 70vw;
+  height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  z-index: 2000;
+}
+
+.cloud {
+  background: url('cloud.png') no-repeat center center;
+  background-size: contain;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2vw;
+}
+
+.text-container-cloud {
+  max-width: 40%; /* 限制最大寬度為背景的90% */
+  text-align: center;
+  margin-bottom: 5%;
+}
+
+.cloud p {
+  font-size: 2vw; /* 增加文字大小 */
+  color: #333;
+  font-weight: bold;
+  word-wrap: break-word;
+}
+
+@keyframes fadeInAndGrow {
+  0% {
+      opacity: 0;
+      transform: scale(0);
+  }
+  100% {
+      opacity: 1;
+      transform: scale(1);
+  }
+}
+
+.cloud-fade-in-and-grow {
+  opacity: 0;
+  transform: scale(0);
+  animation: fadeInAndGrow 2s ease-in-out forwards;
+  animation-delay: 2s; /* 更新這裡將延遲時間改為3秒 */
+}

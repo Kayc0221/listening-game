@@ -1,0 +1,100 @@
+
+.title-container-3-2,
+.grid-container3,
+.game-end-section2 {
+    position: absolute; /* 使用絕對定位來固定位置 */
+    width: 100%; /* 讓其橫向充滿父容器 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.grid-container3 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* 设置元素间的间距 */
+    top: 125%;
+}
+
+.grid-container3 button {
+    width: 4vw; /* 使用视口宽度的百分比 */
+    height: 4vw; /* 保持宽高一致 */
+    min-width: 40px; /* 设置最小宽度 */
+    min-height: 40px; /* 设置最小高度 */
+    border-radius: 50%; /* 圆形按钮 */
+    background-color: rgb(89, 95, 100); /* 按钮背景颜色 */
+    color: white; /* 文本颜色 */
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem; /* 文本大小 */
+    transition: transform 0.3s ease ; /* 过渡动画 */
+}   
+
+.grid-container3 button:hover {
+    transform: scale(1.1); /* 鼠标悬停时放大按钮 */
+}
+
+.grid-item-content2 {
+    position: relative;
+}
+.tick,
+.cross,
+.missed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem; /* 調整為你需要的大小 */
+}
+
+
+.playButton3 {
+    position: relative;
+    width: 4vw;
+    height: 7vh;
+    background-color: red;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+    .playButton3.showClickme::before {
+        content: "ClickMe!";
+        font-size: 1.5vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: block;
+        color: white;
+        animation: blinkAndScale 1.5s infinite alternate;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  
+    }
+
+    .playButton3:hover {
+        background-color: #d60000;
+        transform: scale(1.05);
+    }
+    
+
+    .playButton3:active {
+        background-color: #d60000;
+        transform: scale(0.95) ;
+    }
+
+    .playButton3::after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-left: 2vw solid white;
+        border-top: 1.75vh solid transparent;
+        border-bottom: 1.75vh solid transparent;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }

@@ -1,0 +1,298 @@
+
+.game1-container {
+    position: relative;
+    top: 45vh;
+    left: 50vw;
+    transform: translate(-80%, -150%);
+    z-index: 1001;
+    min-width: 60vw;
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.grid-item:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+.title-container-1,
+.title-container-2,
+.grid-container,
+.audio-control,
+.game-end-section {
+    position: absolute;
+    width: 120%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-container-1 { top: 7vh; }
+.audio-control { top: 12vh; }
+.title-container-2 { top: 23vh; }
+.game-end-section { top: 65vh; }
+
+.game-end-section {
+    font-size: 4vh;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+    position: absolute;
+}
+
+.score-stars-field {
+    margin: 20px;
+}
+
+.game-end-message {
+    font-size: 2.5vw;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+    cursor: pointer;
+}
+
+.score-stars-field {
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.playButton {
+    position: relative;
+    width: 4vw;
+    height: 7vh;
+    background-color: red;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s;
+    transform: translate(-30%, 30%);
+}
+    .playButton.showClickme::before {
+        content: "ClickMe!";
+        font-size: 1.5vw;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        display: block;
+        color: white;
+        animation: blinkAndScale 1.5s infinite alternate;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  
+    }
+
+    .playButton:hover {
+        background-color: #d60000;
+        transform: scale(1.05) translate(-30%, 30%);
+    }
+    
+
+    .playButton:active {
+        background-color: #d60000;
+        transform: scale(0.95) translate(-30%, 30%);
+    }
+
+    .playButton::after {
+        content: '';
+        width: 0;
+        height: 0;
+        border-left: 2vw solid white;
+        border-top: 1.75vh solid transparent;
+        border-bottom: 1.75vh solid transparent;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+        @keyframes blinkAndScale {
+            0% {
+                opacity: 1;
+                transform: translate(-130%, -150%) rotate(-25deg) scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+                transform: translate(-100%, -120%) rotate(-35deg) scale(1.2);
+            }
+        }
+
+
+        .grid-container {
+    top: 80%; /* 這裡設定為父容器高度的 50% */
+    margin: 10px;
+    flex-wrap: wrap;
+}
+
+.grid-item {
+    position: relative;
+    width: calc(14vw - 2vw); /* 使用vw单位，考虑到间隔 */
+    height: 6vh; /* 使用vh单位 */
+    margin: 0.5vw; /* 使用vw单位设置间隔 */
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 3vh; /* 使用vh单位调整字体大小 */
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.grid-item.show {
+    opacity: 1;
+}
+
+.selected::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 3.5vw; /* 更大的尺寸 */
+    height: 6vh; /* 更大的尺寸 */
+    border: 2px solid #085ecf; /* 添加邊框來創建中空效果 */
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    background-color: transparent; /* 背景色設為透明 */
+    box-shadow: 0px 0px 10px 5px #085ecf;
+}
+
+.grid-item-content {
+    position: relative;
+}
+
+.tick,
+.cross,
+.missed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 74px; /* 調整為你需要的大小 */
+}
+
+
+
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+}
+
+.delayed-fade-in {
+    animation: fadeIn 2s ease-in forwards;
+    animation-delay: 8s; /* 和AnimatedTitle的動畫時間一致 */
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.checkAnsButton {
+    background-color: #007BFF; /* 主顏色 */
+    color: white; /* 文字顏色 */
+    border: none;
+    padding: 1vh 1vw; /* 上下和左右的填充 */
+    border-radius: 10px; /* 圓角 */
+    font-size: 1.5vw; /* 文字大小 */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s; /* 平滑過渡效果 */
+    outline: none; /* 移除預設的外框 */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 輕微的陰影 */
+    transform: translate(30%, 40%);
+}
+
+    .checkAnsButton:hover {
+        background-color: #0056b3; /* 鼠標懸停時的顏色 */
+        transform: scale(1.05) translate(30%, 40%); /* 鼠標懸停時輕微放大 */
+    }
+
+    .checkAnsButton:active {
+        background-color: #004392; /* 點擊時的顏色 */
+        transform: scale(0.95) translate(30%, 40%); /* 點擊時輕微縮小 */
+    }
+
+    .checkAnsButton:focus {
+        box-shadow: 0 0 0 3px rgba(0,123,255,0.5); /* 為了可訪問性，當按鈕聚焦時顯示一個顏色的外框 */
+    }
+
+/* 调整文本和难度标签的样式 */
+.snr-label-container {
+    text-align: center; /* 文本居中 */
+    margin-bottom: 8px; /* 与滑动条的间距 */
+}
+
+.snr-instruction-text {
+    font-size: 20px; /* 字体大小 */
+    font-weight: bold; /* 加粗字体 */
+    color: white; /* 字体颜色为白色 */
+    display: block; /* 使其独占一行 */
+}
+
+/* 滑动条样式 */
+.snr-slider-container input[type="range"] {
+    -webkit-appearance: none; /* 移除默认样式 */
+    appearance: none;
+    width: 100%; /* 滑动条宽度 */
+    height: 10px; /* 滑动条高度 */
+    background: #ddd; /* 背景颜色 */
+    outline: none; /* 移除轮廓 */
+    opacity: 0.7; /* 透明度 */
+    -webkit-transition: .2s; /* 过渡效果 */
+    transition: opacity .2s;
+    margin: 10px 0; /* 上下间距 */
+}
+
+    /* 滑动条滑块（thumb）样式 */
+    .snr-slider-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none; /* 移除默认样式 */
+        appearance: none;
+        width: 25px; /* 滑块宽度 */
+        height: 25px; /* 滑块高度 */
+        background: #4CAF50; /* 滑块颜色 */
+        cursor: pointer; /* 鼠标指针变成手指形状 */
+        border-radius: 50%; /* 圆形滑块 */
+    }
+
+    .snr-slider-container input[type="range"]::-moz-range-thumb {
+        width: 25px; /* 滑块宽度 */
+        height: 25px; /* 滑块高度 */
+        background: #4CAF50; /* 滑块颜色 */
+        cursor: pointer; /* 鼠标指针变成手指形状 */
+        border-radius: 50%; /* 圆形滑块 */
+    }
+
+/* 难度标签样式 */
+.snr-difficulty-label {
+    font-size: 40px; /* 增大字体大小 */
+    font-weight: bold; /* 加粗字体 */
+    color: white; /* 字体颜色为白色 */
+    display: inline; /* 行内显示 */
+    margin-top: 12px; /* 与滑动条的间距 */
+}
+
+
+

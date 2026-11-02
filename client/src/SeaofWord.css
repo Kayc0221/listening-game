@@ -1,0 +1,8 @@
+.game-end-section4 { top: 50vh; }
+
+.game-end-section4 {
+    font-size: 4vh;
+    color: white;
+    text-shadow: 2px 2px 4px black;
+    position: absolute;
+}

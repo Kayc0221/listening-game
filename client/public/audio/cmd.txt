@@ -1,0 +1,12 @@
+$files = Get-ChildItem -Filter *.wav | Sort-Object { [int]($_.Name -replace '(\d+).*', '$1') }
+
+$baseName = "1-"
+$count = 1
+
+foreach ($file in $files) {
+    $newName = $baseName + $count.ToString()
+    $file | Rename-Item -NewName ($newName + ".wav") -Force
+    $count++
+}
+
+Write-Host ".wav 文件已按前置数字排序并重新命名完成。"

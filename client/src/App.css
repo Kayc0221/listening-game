@@ -1,0 +1,138 @@
+.App {
+    text-align: center;
+    height: 100vh; /* Already relative */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.App-logo {
+    height: 40vmin; 
+    pointer-events: none;
+    animation: app-logo-spin infinite 10s linear;
+}
+
+.input-field {
+    padding: 1em; /* Changed to em */
+    margin: 0.5em; /* Changed to em */
+    font-size: 1.125rem; /* Changed to rem */
+    border: 1px solid #ccc;
+    border-radius: 0.25em; /* Changed to em */
+}
+
+.button {
+    padding: 1em 2em; /* Changed to em */
+    font-size: 1.125rem; /* Changed to rem */
+    margin-top: 1em; /* Changed to em */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 0.25em; /* Changed to em */
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+.background-image {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.welcome-message {
+    max-width: 43.75rem; /* Changed to rem, equivalent to 700px */
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+@keyframes app-logo-spin {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    50% {
+        transform: translate(0, -20px) rotate(180deg);
+    }
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+    }
+}
+
+
+.user-profile {
+    position: absolute;
+    top: 10vh; /* Changed to rem, equivalent to 150px */
+    right: 10vw; /* Changed to rem, equivalent to 350px */
+    display: flex;
+    align-items: center;
+    gap: 1.1vw; /* Changed to rem, equivalent to 50px */
+}
+
+.user-profile-text {
+    color: #f0faf3;
+    font-size: 3.5vw; /* Changed to rem */
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+.user-profile-png {
+    filter: invert(1);
+    width: 5vw; /* Changed to rem, equivalent to 120px */
+    height: 5vw; /* Changed to rem, equivalent to 120px */
+    object-fit: cover;
+}
+
+
+.centered-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
+}
+
+
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+    animation-delay: 1.5s;
+}
+
+
+@keyframes moveToTopRightAndFade {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(100%, -100%) scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.move-to-top-right-and-fade {
+    height: 40vmin;
+    animation: moveToTopRightAndFade 4s ease-in-out forwards;
+    animation-timing-function: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}

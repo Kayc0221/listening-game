@@ -1,0 +1,59 @@
+.volume-container {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+    .volume-container img {
+        width: 48px;
+        height: 48px;
+        margin-right: 20px;
+        filter: invert(100%); /* 反白效果，將 100% 表示完全反白 */
+    }
+
+/* 音量滑桿 */
+.volume-slider {
+    -webkit-appearance: none; /* 清除預設外觀 */
+    width: 100%; /* 完全填充容器 */
+    height: 4px;
+    background: #ccc; /* 底層軌道顏色 */
+    outline: none; /* 刪除焦點時的外框 */
+    opacity: 0.7;
+    transition: opacity 0.2s; /* 透明度過渡 */
+}
+
+    /* 滑塊 */
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 16px;
+        height: 16px;
+        background: #007bff; /* 滑塊顏色 */
+        cursor: pointer; /* 變成手指形狀 */
+    }
+
+    .volume-slider::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        background: #007bff;
+        cursor: pointer;
+    }
+
+    /* 鼠標懸停或點擊時 */
+    .volume-slider:hover,
+    .volume-slider:active {
+        opacity: 1.0;
+    }
+
+    .volume-icon {
+    transition: transform 0.3s ease-in-out;
+}
+
+        .volume-icon:hover {
+            transform: scale(1.2);
+        }
+        .volume-icon:active {
+            transform: scale(0.9);
+        }

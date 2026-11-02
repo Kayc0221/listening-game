@@ -1,0 +1,9 @@
+:80 {
+    root * C:\Users\lunke\OneDrive\Desktop\new-react\client\build
+    file_server
+
+    reverse_proxy /api* localhost:3010
+
+    try_files {path} /index.html
+}
+

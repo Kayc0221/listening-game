@@ -1,0 +1,46 @@
+.EndGameBar-container {
+    position: fixed;
+    top: 40%;
+    left: 10%;
+    width: 80%;
+    height: 20vh;
+    background-color: transparent; /* 可設置為透明或其他適合的背景顏色 */
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 確保線段均勻分布 */
+}
+
+.EndGameBar-background {
+    width: 100%;
+    height: 2px; /* 使背景條更細，看起來像一條線 */
+    background-color: #ccc; /* 設置背景條顏色 */
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.EndGameBar-grid-line {
+    width: 1px;
+    height: 15px; /* 線段高度 */
+    background-color: black; /* 線段顏色 */
+    position: absolute;
+}
+
+.EndGameBar-fill {
+    height: 15px; /* 與線段相同高度 */
+    background-color: blue;
+    position: absolute;
+    bottom: 50%;
+    transform: translateY(50%); /* 確保填充與線段對齊 */
+}
+
+.EndGame-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 20px; /* 根據需要調整 */
+    font-size: 1.5vh;
+    color: black; /* 文字顏色 */
+}

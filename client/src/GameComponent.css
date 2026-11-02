@@ -1,0 +1,90 @@
+.game-container {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translate(-50%, -65%);
+    z-index: 1000;
+}
+
+.level-name {
+    text-align: center;
+    margin-bottom: 5vh;
+    font-size: 8vw;
+    -webkit-text-stroke: 0.1vw white;
+}
+
+.description-container {
+    background-color: rgba(59, 57, 57, 0.703);
+    position: relative;
+    padding: 20px;
+}
+
+.description-text {
+    font-size: 3vw;
+    color: rgb(255, 255, 255);
+    -webkit-text-stroke: 0.1vw black;
+    padding: 0.1vw;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* 添加文字陰影增加清晰度 */
+    font-weight: bold; /* 字體加粗 */
+}
+
+.next-level-button, .start-game-button {
+    position: absolute;
+    right: 1vw;
+    bottom: 1vw;
+    background: none;
+    border: none;
+    font-size: 1.5vw;
+    cursor: pointer;
+}
+
+.next-icon {
+    height: 6vh;
+    width: auto;
+}
+
+.start-game-button:hover {
+    transform: rotate(-25deg) scale(1.2);
+}
+
+.start-game-button:active {
+    transform: rotate(25deg) scale(0.9);
+}
+
+@keyframes fadeInAndGrow {
+    0% {
+        opacity: 0;
+        transform: scale(0);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-and-grow {
+    opacity: 0;
+    transform: scale(0);
+    animation: fadeInAndGrow 2s ease-in-out forwards;
+    animation-delay: 1.5s;
+}
+
+.game-icon-expanded {
+    position: absolute;
+    width: 10vw; /* 初始大小调整为视窗宽度的百分比 */
+    height: 10vh; /* 初始大小调整为视窗高度的百分比 */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: expandImage 1s forwards;
+}
+
+@keyframes expandImage {
+    to {
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        transform: none;
+    }
+}

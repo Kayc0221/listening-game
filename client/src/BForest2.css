@@ -1,0 +1,13 @@
+.grid-item-content5 {
+    position: relative;
+}
+.tick,
+.cross,
+.missed {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem; /* 調整為你需要的大小 */
+}
+
