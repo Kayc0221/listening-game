@@ -1,58 +1,67 @@
-// api.js — 所有對後端 (Cloud Function) 的請求都集中在這裡
+// api.js — 所有對後端 (Google Apps Script 網頁應用程式，資料存在 Google 試算表) 的請求都集中在這裡
+// 後端程式碼在 apps-script/Code.gs；本機開發可用 scripts/mock/server.js
 const apiBaseUrl = process.env.REACT_APP_API_URL;
 
 export class ApiError extends Error {
-    constructor(status, path) {
-        super(`Server error ${status} for ${path}`);
+    constructor(status, action, message) {
+        super(`Server error ${status} for ${action}${message ? `: ${message}` : ''}`);
         this.status = status;
     }
 }
 
-const request = async (path, options) => {
-    const response = await fetch(`${apiBaseUrl}${path}`, options);
+// Apps Script 一律回 HTTP 200，錯誤放在 body 的 { error, status }
+const handle = async (response, action) => {
     if (!response.ok) {
-        throw new ApiError(response.status, path);
+        throw new ApiError(response.status, action);
     }
-    return response.json();
+    const data = await response.json();
+    if (data && data.error) {
+        throw new ApiError(data.status || 500, action, data.error);
+    }
+    return data;
 };
 
-const query = (params) => new URLSearchParams(params).toString();
+const get = async (action, params = {}) => {
+    const query = new URLSearchParams({ action, ...params }).toString();
+    return handle(await fetch(`${apiBaseUrl}?${query}`), action);
+};
 
-const postJson = (path, body) => request(path, {
+// 用 text/plain 送 JSON：避免 CORS preflight (Apps Script 不處理 OPTIONS)，密碼也不會出現在網址裡
+const post = async (action, body) => handle(await fetch(apiBaseUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-});
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action, ...body }),
+}), action);
 
 export const login = (username, password) =>
-    postJson('/api/login', { username, password });
+    post('login', { username, password });
 
 export const getPlayedGames = (username) =>
-    request(`/api/getPlayedGames?${query({ username })}`);
+    get('getPlayedGames', { username });
 
 export const selectRandomGames = (username, gameType) =>
-    request(`/api/selectRandomGames?${query({ username, gameType })}`);
+    get('selectRandomGames', { username, gameType });
 
 export const getGameData = (gameId) =>
-    request(`/api/getGameDatas?${query({ gameId })}`);
+    get('getGameDatas', { gameId });
 
 export const getTip = (tipClass) =>
-    request(`/api/getTips?${query({ class: tipClass })}`);
+    get('getTips', { class: tipClass });
 
 // 取得使用者的平均分數 (0-10)，失敗時回傳預設值 5
 export const getAverageScore = async (username) => {
     try {
-        return await request(`/api/getAvarageScore?${query({ username })}`);
+        return await get('getAvarageScore', { username });
     } catch (error) {
         console.error('Error fetching average score:', error);
         return 5;
     }
 };
 
-// 分數以 "<gameId> : <score>" 的字串格式存入 maindata
+// 分數以 "<gameId> : <score>" 的字串格式存入試算表的 scores 工作表
 export const submitScore = async (username, gameId, score) => {
     try {
-        await postJson('/maindata/updateScore', { username, scoreInfo: `${gameId} : ${score}` });
+        await post('updateScore', { username, scoreInfo: `${gameId} : ${score}` });
     } catch (error) {
         console.error('Error updating score:', error);
     }
