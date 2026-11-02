@@ -3,5 +3,3 @@ build/
 .firebase/
 *.log
 
-# One-off admin script with a hard-coded database password; keep it out of git
-client/dbmanagement.js

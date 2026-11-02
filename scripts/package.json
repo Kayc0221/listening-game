@@ -1,0 +1,8 @@
+{
+  "name": "new-react-scripts",
+  "private": true,
+  "description": "One-off database maintenance scripts",
+  "dependencies": {
+    "mongodb": "^6.5.0"
+  }
+}
