@@ -61,8 +61,8 @@
 
 .playButton {
     position: relative;
-    width: 4vw;
-    height: 7vh;
+    width: 7vmin; /* 寬高用同一個單位，任何螢幕比例都是正圓 (原本 4vw x 7vh 會變橢圓) */
+    height: 7vmin;
     background-color: red;
     border-radius: 50%;
     cursor: pointer;
@@ -100,9 +100,9 @@
         content: '';
         width: 0;
         height: 0;
-        border-left: 2vw solid white;
-        border-top: 1.75vh solid transparent;
-        border-bottom: 1.75vh solid transparent;
+        border-left: 3.5vmin solid white; /* 三角形也用 vmin，比例才不會跟著螢幕變 */
+        border-top: 1.75vmin solid transparent;
+        border-bottom: 1.75vmin solid transparent;
         position: absolute;
         top: 50%;
         left: 50%;
@@ -154,8 +154,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 3.5vw; /* 更大的尺寸 */
-    height: 6vh; /* 更大的尺寸 */
+    width: 6vmin; /* 正圓：寬高同單位 */
+    height: 6vmin;
     border: 2px solid #085ecf; /* 添加邊框來創建中空效果 */
     border-radius: 50%;
     transform: translate(-50%, -50%);
@@ -296,3 +296,9 @@
 
 
 
+
+/* 題目或難度還沒準備好：播放鍵變暗、不能按 */
+.playButton.is-waiting {
+    opacity: 0.45;
+    cursor: wait;
+}
