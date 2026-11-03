@@ -3,3 +3,6 @@ build/
 .firebase/
 *.log
 
+
+# Converted question banks (convert_banks.py output); the data lives in the Google Sheet, not in this public repo
+upload/

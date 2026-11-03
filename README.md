@@ -60,6 +60,14 @@ mock 的資料都在記憶體裡，重新啟動就會清空。文字海用的是
    ```
    在 `questions` 工作表 → 檔案 → 匯入 → 上傳 `game4.tsv` → 「附加到目前的工作表」，
    並**取消勾選「將文字轉換為數字、日期和公式」**。
+
+   其他遊戲與溝通小訣竅的原始題庫 (`modeule1.docx`、`modeule2.xlsx`、`modeule3.xlsx`、
+   `Communication skills tips.docx`) 用這支程式轉換，會一併檢查答案、選項與音檔：
+   ```bash
+   python -I scripts/data-prep/convert_banks.py <題庫資料夾> upload
+   ```
+   `upload/questions.tsv` 以同樣方式附加到 `questions` 工作表，`upload/tips.tsv` 附加到 `tips` 工作表。
+   `upload/` 不會進 git：題庫只放在試算表裡，不放在公開的 repo。
 5. Apps Script 右上角「部署」→「新增部署作業」→ 類型「網頁應用程式」，
    執行身分「我」、存取權「所有人」→ 部署，複製網址 (`https://script.google.com/macros/s/.../exec`)。
    之後修改 Code.gs 要選「管理部署作業」→ 編輯 → 新版本，網址才會維持不變。

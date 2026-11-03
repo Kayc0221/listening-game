@@ -1,6 +1,7 @@
 // 本機 mock 後端：在 Node 裡執行 apps-script/Code.gs，試算表改用記憶體中的表格
 // 用法：node scripts/mock/server.js   (預設 http://localhost:3010，測試帳號 test / test)
 //       MOCK_GAMES=4 node scripts/mock/server.js   只放文字海的題目
+//       MOCK_QUESTIONS=questions.tsv MOCK_TIPS=tips.tsv node scripts/mock/server.js   用 convert_banks.py 的輸出
 // 前端搭配：REACT_APP_API_URL=http://localhost:3010 npm start
 const fs = require('fs');
 const path = require('path');
@@ -47,11 +48,19 @@ const wordSea = JSON.parse(fs.readFileSync(path.join(root, 'scripts', 'data-prep
   .map((q) => ({ gameId: q.gameId, text: asCell(q.text), ans: asCell(q.ans), voice: q.voice }));
 
 addSheet('users', ['username', 'password_sha256'], [{ username: 'test', password_sha256: sha256('test') }]);
+// MOCK_QUESTIONS / MOCK_TIPS 指向 convert_banks.py 產生的 TSV 時，用真的題庫取代假題目
+const readTsv = (file, headers) => fs.readFileSync(file, 'utf8').split(/\r?\n/).filter(Boolean)
+  .map((line) => Object.fromEntries(line.split('\t').map((v, i) => [headers[i], v])));
+const baseQuestions = process.env.MOCK_QUESTIONS
+  ? readTsv(process.env.MOCK_QUESTIONS, ['gameId', 'text', 'ans', 'voice'])
+  : fixtures.questions;
+const tips = process.env.MOCK_TIPS ? readTsv(process.env.MOCK_TIPS, ['index', 'class', 'tip']) : fixtures.tips;
+
 // MOCK_GAMES=4 只載入 gameType 4 的題目 (模擬其他遊戲還沒有題庫的情況)
 const onlyGames = process.env.MOCK_GAMES ? process.env.MOCK_GAMES.split(',') : null;
-const questions = [...fixtures.questions, ...wordSea].filter((q) => !onlyGames || onlyGames.includes(q.gameId.split('-')[0]));
+const questions = [...baseQuestions, ...wordSea].filter((q) => !onlyGames || onlyGames.includes(q.gameId.split('-')[0]));
 addSheet('questions', ['gameId', 'text', 'ans', 'voice'], questions);
-addSheet('tips', ['index', 'class', 'tip'], fixtures.tips);
+addSheet('tips', ['index', 'class', 'tip'], tips);
 addSheet('scores', ['timestamp', 'username', 'gameId', 'score']);
 
 // ---- 假的 Apps Script 全域物件 ----
