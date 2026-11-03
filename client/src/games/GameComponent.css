@@ -76,6 +76,7 @@
     position: absolute;
     width: 10vw; /* 初始大小调整为视窗宽度的百分比 */
     height: 10vh; /* 初始大小调整为视窗高度的百分比 */
+    object-fit: cover; /* 放大到全螢幕時裁掉邊緣，而不是把圖拉扁 (螢幕比例不是 16:9 時) */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -90,4 +91,43 @@
         left: 0;
         transform: none;
     }
+}
+
+/* 題目載入中 / 載入失敗 / 這一關出錯 */
+.level-status {
+    padding: 3vmin 5vmin;
+    border-radius: 2vmin;
+    background: rgba(30, 30, 40, 0.75);
+    color: #fff;
+    font-size: 3.2vmin;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.9);
+}
+
+.level-status p {
+    margin: 0;
+}
+
+.level-status-button {
+    margin-top: 2vmin;
+    padding: 1vmin 3vmin;
+    border: none;
+    border-radius: 1vmin;
+    background: #ffd280;
+    color: #3b2a10;
+    font-size: 2.6vmin;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* 沿用上一關畫面時蓋在上面，擋住所有點擊 */
+.level-loading-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1500;
 }

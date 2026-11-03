@@ -13,6 +13,11 @@ import { asset } from '../../asset';
 
 
 
+// gameType 5 的題目：[0] 是 4 組 (難度 0-3) [答案, 干擾一, 干擾二]，[1] 是 4 個答案
+const isGame5Data = (data) =>
+    Array.isArray(data) && Array.isArray(data[0]) && data[0].length === 4 &&
+    data[0].every((group) => Array.isArray(group) && group.length === 3) && Array.isArray(data[1]);
+
 const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
     const { pauseAudio, addAudio, playAudio } = useAudio();
@@ -34,8 +39,12 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [answerResult, setAnswerResult] = useState(null); // 'correct' 或 'incorrect'
 
-    const [Difficulty, setDifficulty] = useState(0); // 假设默认值为 1
-    
+    const [Difficulty, setDifficulty] = useState(0);
+    const [averageScore, setAverageScore] = useState(null);
+    const [difficultyFor, setDifficultyFor] = useState(null); // 難度是用哪一關的題目算的
+    // 這一關的題目與難度都準備好了才能播放
+    const isReady = difficultyFor === choicedGamedata && isGame5Data(choicedGamedata);
+
     const [btnnameA,setBtnnameA] =useState('A2')
     const [btnnameB,setBtnnameB] =useState('B2')
     const [btnnameC,setBtnnameC] =useState('C2')
@@ -54,7 +63,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
     const handleButtonClick = async (buttonType) => {
-        if (currentStep === 'speed_played'||currentStep === 'question') {  // 如果按钮已点击且还未确认答案，直接返回
+        if (!isReady || currentStep === 'speed_played'||currentStep === 'question') {  // 如果按钮已点击且还未确认答案，直接返回
             return;
         }
 
@@ -111,18 +120,25 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     }, [aPlayed, bPlayed,cPlayed]);
 
 
+    // 平均分數：一開始和每次作答後更新
     useEffect(() => {
-        const fetchAndSetDifficulty = async () => {
-            // 获取平均分数
-            const averageScore = await getAverageScore(username);
-            const Difficulty = convertScoreToDifficulty(averageScore);
-            setDifficulty(Difficulty);
-        };
+        let isMounted = true;
+        getAverageScore(username).then((score) => { if (isMounted) setAverageScore(score); });
+        return () => { isMounted = false; };
+    }, [hasCheckedChoices, username]);
 
-        fetchAndSetDifficulty();
-    }, [hasCheckedChoices,choicedGamedata, username]); // 依赖项数组包含 hasCheckedChoices 和 username
+    // 每一關只在拿到這一關的題目時算一次難度：作答後才更新難度會重新洗牌按鈕，讓 ✓/✗ 標在錯的選項上
+    useEffect(() => {
+        if (averageScore === null || difficultyFor === choicedGamedata || !isGame5Data(choicedGamedata)) {
+            return;
+        }
+        setDifficulty(convertScoreToDifficulty(averageScore));
+        setDifficultyFor(choicedGamedata);
+    }, [averageScore, choicedGamedata, difficultyFor]);
 
     useEffect(() => {
+        // 題目格式不對 (例如還是 ㄅㄅ森林前段的資料) 時不初始化，之前會讀到不存在的選項組而整個畫面當掉
+        if (!isReady) return;
         // 初始化遊戲
         const initGame = () => {
             // 生成一個隨機的ABC排序
@@ -153,7 +169,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         };
     
         initGame();
-    }, [Difficulty, choicedGamedata]);
+    }, [isReady, Difficulty, choicedGamedata]);
     
     
     
@@ -218,7 +234,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 )}
             {showState >= 2 && (
                     <div className="audio-control">
-                        <div className={`playButton ${!buttonClicked ? 'showClickme' : ''}`} onClick={() => handleButtonClick('A')}></div>
+                        <div className={`playButton ${!buttonClicked && isReady ? 'showClickme' : ''} ${!isReady ? 'is-waiting' : ''}`} onClick={() => handleButtonClick('A')}></div>
                         <AudioAmplitude />
                     </div>
             )}
