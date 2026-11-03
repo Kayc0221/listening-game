@@ -4,6 +4,15 @@ import { asset } from '../asset';
 
 const AudioContext = createContext();
 
+// 預先下載音檔到瀏覽器快取；之後 addAudio 同一個檔案時可以馬上播放
+const preloaded = new Set();
+export const preloadAudio = (src) => {
+    const url = asset(`/audio/${src}`);
+    if (preloaded.has(url)) return;
+    preloaded.add(url);
+    fetch(url).catch(() => preloaded.delete(url));
+};
+
 export const useAudio = () => {
     const context = useContext(AudioContext);
     if (!context) {

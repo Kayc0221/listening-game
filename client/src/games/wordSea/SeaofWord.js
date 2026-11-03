@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './SeaofWord.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
 import AudioAmplitude from '../../components/AudioAmplitude';
-import { useAudio } from '../../contexts/AudioContext';
+import { useAudio, preloadAudio } from '../../contexts/AudioContext';
 import ScoreStarsField from '../../components/ScoreStarsField';
 import { getAverageScore, submitScore } from '../../api';
 import { asset } from '../../asset';
@@ -27,7 +27,9 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
     const [callCount, setCallCount] = useState(0);
 
-    const [Difficulty, setDifficulty] = useState(0); // 假设默认值为 1
+    const [Difficulty, setDifficulty] = useState(0); // 0 = 這一關的難度還沒算出來
+    const [averageScore, setAverageScore] = useState(null);
+    const [difficultyFor, setDifficultyFor] = useState(null); // 難度是用哪一關的題目算的
     const [ans, setAns] = useState('');
     const [target, setTarget] = useState('');
     const [showTarget, setShowTarget] = useState(true);
@@ -60,8 +62,11 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         playAudioAt(`game4/${choicedGamedata[2]}.wav`, hasCheckedChoices ? 4500 : 6500, onSentenceEnded);
     };
 
+    // 這一關的難度、目標字都算好了才能播放 (否則難度還是 0，按下去要等 6.5 秒整句才出聲)
+    const isReady = difficultyFor === choicedGamedata && Difficulty > 0;
+
     const handleButtonClick = () => {
-        if (buttonClicked) {  // 如果按钮已点击且还未确认答案，直接返回
+        if (buttonClicked || !isReady) {  // 如果按钮已点击且还未确认答案，直接返回
             return;
         }
         setShowTarget(true);
@@ -91,22 +96,33 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
 
+    // 平均分數：一開始和每次作答後更新 (後端一次請求約 2-3 秒)
     useEffect(() => {
-        const fetchAndSetDifficulty = async () => {
-            // 获取平均分数
-            const averageScore = await getAverageScore(username);
-            const Difficulty = convertScoreToDifficulty(averageScore);
-            const originalAns = choicedGamedata[1][1];
-            const newAns = originalAns.substring(0, Difficulty);
-            const originalTarget = choicedGamedata[1][0];
-            const newTarget = originalTarget.substring(0, Difficulty);
-            setAns(newAns);
-            setTarget(newTarget);
-            setDifficulty(Difficulty);
-        };
+        let isMounted = true;
+        getAverageScore(username).then((score) => { if (isMounted) setAverageScore(score); });
+        return () => { isMounted = false; };
+    }, [hasCheckedChoices, username]);
 
-        fetchAndSetDifficulty();
-    }, [hasCheckedChoices,choicedGamedata, username]); // 依赖项数组包含 hasCheckedChoices 和 username
+    // 每一關只在拿到這一關的題目時算一次難度，作答後平均分數更新也不會改到正在顯示的答案
+    useEffect(() => {
+        if (averageScore === null || difficultyFor === choicedGamedata || !Array.isArray(choicedGamedata[1])) {
+            return;
+        }
+        const newDifficulty = convertScoreToDifficulty(averageScore);
+        setAns(choicedGamedata[1][1].substring(0, newDifficulty));
+        setTarget(choicedGamedata[1][0].substring(0, newDifficulty));
+        setDifficulty(newDifficulty);
+        setDifficultyFor(choicedGamedata);
+    }, [averageScore, choicedGamedata, difficultyFor]);
+
+    // 先把這一關會播的音檔下載好，按下播放時才不會等網路
+    useEffect(() => {
+        if (!isReady) return;
+        for (let i = 1; i <= Difficulty; i++) {
+            preloadAudio(`game4/${choicedGamedata[2]}-${i}.wav`);
+        }
+        preloadAudio(`game4/${choicedGamedata[2]}.wav`);
+    }, [isReady, Difficulty, choicedGamedata]);
 
 
 
@@ -279,7 +295,7 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 )}
                 {showState >= 2 && (
                         <div className="audio-control">
-                            <div className={`playButton ${!buttonClicked ? 'showClickme' : ''}`} onClick={handleButtonClick}></div>
+                            <div className={`playButton ${!buttonClicked && isReady ? 'showClickme' : ''} ${!isReady ? 'is-waiting' : ''}`} onClick={handleButtonClick}></div>
                             <AudioAmplitude audio={newIndex1} />
                         </div>
                 )}
