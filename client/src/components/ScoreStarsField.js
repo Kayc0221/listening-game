@@ -8,7 +8,7 @@ function StarField({ state, numStars }) {
     const stars = Array.from({ length: numStars }, (_, i) => i + 1).map(n => n <= state);
 
     return (
-        <div className="star-field">
+        <div className={`star-field stars-${numStars}`}>
             {stars.map((active, index) => (
                 <div key={index} className={`star-item star-${index}`}>
                     <ScoreStars active={active} />

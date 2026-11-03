@@ -28,3 +28,15 @@
     left: 33.33%; /* 与.star-1在同一水平位置 */
     top: 3vh; /* 设置为视窗高度的百分比 */
 }
+
+/* 5 顆星 (ㄅㄅ森林前段，一關一顆)：排成弧形，欄位加寬讓星星 (10vmin) 不重疊 */
+/* 星星本身是 10vmin，所以間距和高度也用 vmin，任何螢幕比例都不會重疊或超出畫面上緣 */
+.star-field.stars-5 {
+    width: 54vmin;
+}
+
+.stars-5 .star-0 { left: 0; top: 0; }
+.stars-5 .star-1 { left: 11vmin; top: -2vmin; }
+.stars-5 .star-2 { left: 22vmin; top: -3vmin; }
+.stars-5 .star-3 { left: 33vmin; top: -2vmin; }
+.stars-5 .star-4 { left: 44vmin; top: 0; }

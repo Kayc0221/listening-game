@@ -245,7 +245,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         <>
             <div className="game2-container">
                 {showState >= 0 && (
-                    <ScoreStarsField state={Math.floor(callCount/1.25)} numStars={4} className="score-stars-field" />
+                    <ScoreStarsField state={callCount} numStars={5} className="score-stars-field" />
                 )}
 
                 {showState >= 1 && ( 
