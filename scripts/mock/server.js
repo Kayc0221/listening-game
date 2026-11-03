@@ -2,6 +2,7 @@
 // 用法：node scripts/mock/server.js   (預設 http://localhost:3010，測試帳號 test / test)
 //       MOCK_GAMES=4 node scripts/mock/server.js   只放文字海的題目
 //       MOCK_QUESTIONS=questions.tsv MOCK_TIPS=tips.tsv node scripts/mock/server.js   用 convert_banks.py 的輸出
+//       MOCK_DELAY_MS=2500 node scripts/mock/server.js   每個請求延遲 2.5 秒 (接近真的 Apps Script)
 // 前端搭配：REACT_APP_API_URL=http://localhost:3010 npm start
 const fs = require('fs');
 const path = require('path');
@@ -90,7 +91,8 @@ http.createServer((req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   let body = '';
   req.on('data', (chunk) => { body += chunk; });
-  req.on('end', () => {
+  // MOCK_DELAY_MS=2500 模擬真的 Apps Script 每個請求要等 2-3 秒
+  req.on('end', () => setTimeout(() => {
     const output = req.method === 'POST'
       ? context.doPost({ postData: { contents: body } })
       : context.doGet({ parameter: Object.fromEntries(url.searchParams) });
@@ -99,5 +101,5 @@ http.createServer((req, res) => {
     console.log(`${req.method} ${label} -> ${result && result.error ? `error ${result.status}: ${result.error}` : 'ok'}`);
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.end(output.content);
-  });
+  }, Number(process.env.MOCK_DELAY_MS || 0)));
 }).listen(PORT, () => console.log(`Mock backend on http://localhost:${PORT} (user: test / test)`));
