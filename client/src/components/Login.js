@@ -5,8 +5,12 @@ function Login({ onLoginSuccess }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleLogin = async () => {
+        // 登入請求要 2-3 秒：期間再按 Enter / Login 不要重送 (之前會登入兩次、背景音樂播兩首)
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         setError('');
         try {
             const data = await login(username, password);
@@ -18,6 +22,8 @@ function Login({ onLoginSuccess }) {
         } catch (err) {
             console.error('Login failed', err);
             setError('無法連線到伺服器，請稍後再試');
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -45,7 +51,7 @@ function Login({ onLoginSuccess }) {
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
-            <button className="button" onClick={handleLogin}>Login</button>
+            <button className="button" onClick={handleLogin} disabled={isSubmitting}>{isSubmitting ? '登入中…' : 'Login'}</button>
             {error && <p style={{ color: 'white', textShadow: '2px 2px 4px black' }}>{error}</p>}
         </div>
     );

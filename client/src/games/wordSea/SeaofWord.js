@@ -1,5 +1,5 @@
 // SeaofWord.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './SeaofWord.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
 import AudioAmplitude from '../../components/AudioAmplitude';
@@ -45,12 +45,16 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         return 3;
     };
 
+    // 排好的音檔計時器；換關或離開時清掉，否則再聽一次後馬上按下一關，上一關的聲音會在新的一關播出來
+    const audioTimers = useRef([]);
+    useEffect(() => () => audioTimers.current.forEach(clearTimeout), []);
+
     const playAudioAt = (file, delay, onEnded) => {
-        setTimeout(() => {
+        audioTimers.current.push(setTimeout(() => {
             const audioIndex = addAudio(file, false, false, null, onEnded);
             setNewIndex1(audioIndex);
             playAudio(audioIndex);
-        }, delay);
+        }, delay));
     };
 
     // 依難度先每 1.3 秒播一個目標字，再播整句 (再聽一次時整句提早播)
@@ -215,7 +219,10 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
     const startNewRound = () => { 
 
+        audioTimers.current.forEach(clearTimeout);
+        audioTimers.current = [];
         setCallCount(prevCount => prevCount + 1); 
+        setWordArray([]); // 上一關的字不要留著 (看不見但還按得到)
         setSelected(new Set());
         setButtonClicked(false);
         setShowWordIndex(-1);

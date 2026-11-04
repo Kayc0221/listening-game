@@ -18,21 +18,20 @@ const ShowTips = ({ classValue, onClick }) => {
 
         const fetchRandomTip = async () => {
             try {
+                // 盡量挑沒看過的小訣竅，但最多問 3 次 (每次 2-3 秒；之前最多 10 次，要等 20 幾秒)，還是重複就照樣顯示
                 let data;
-                let attempts = 0; // 用於控制嘗試次數
-                const maxAttempts = 10; // 最多嘗試10次以避免無限循環
-
+                let attempts = 0;
                 do {
                     data = await getTip(classValue);
                     attempts++;
-                } while (shownTips.includes(data.index) && attempts < maxAttempts); // 確保新提示未被顯示過
+                } while (shownTips.includes(data.index) && attempts < 3);
 
-                if (isMounted && data && !shownTips.includes(data.index)) {
+                if (isMounted && data) {
                     setTip(data.tip);
                     if (data.index !== null) {
                         const tipsAudio = await addAudio(`tips/${data.index}.wav`, false);
                         await playAudio(tipsAudio);
-                        setShownTips((prevShownTips) => [...prevShownTips, data.index]); // 播放完成後更新 shownTips
+                        setShownTips((prevShownTips) => (prevShownTips.includes(data.index) ? prevShownTips : [...prevShownTips, data.index]));
                     }
                 }
             } catch (error) {

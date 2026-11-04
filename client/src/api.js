@@ -71,10 +71,15 @@ export const getAverageScore = async (username) => {
 };
 
 // 分數以 "<gameId> : <score>" 的字串格式存入試算表的 scores 工作表
-export const submitScore = async (username, gameId, score) => {
-    try {
-        await post('updateScore', { username, scoreInfo: `${gameId} : ${score}` });
-    } catch (error) {
-        console.error('Error updating score:', error);
-    }
+// 失敗時重試一次；送出中的請求記在 pendingScores，讀取進度前先等它們寫完
+const pendingScores = new Set();
+export const submitScore = (username, gameId, score) => {
+    const send = () => post('updateScore', { username, scoreInfo: `${gameId} : ${score}` });
+    const request = send()
+        .catch(() => send())
+        .catch((error) => console.error('Error updating score:', error))
+        .finally(() => pendingScores.delete(request));
+    pendingScores.add(request);
+    return request;
 };
+export const waitForPendingScores = () => Promise.all([...pendingScores]);

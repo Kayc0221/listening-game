@@ -102,6 +102,18 @@ export const AudioProvider = ({ children }) => {
         }
 
         newAudio.isBackground = isBackground;
+        // 背景音樂固定放在索引 0 (各遊戲用 pauseAudio(0) / playAudio(0) 控制它)。
+        // 登出再登入時換掉舊的那首，否則新的會排到後面，遊戲暫停的是舊的，兩首會疊在一起播
+        if (isBackground) {
+            const old = audioSources.current[0];
+            if (old instanceof Audio) {
+                old.pause();
+                old.src = '';
+                if (old.outputNode) old.outputNode.disconnect();
+            }
+            audioSources.current[0] = newAudio;
+            return 0;
+        }
         audioSources.current.push(newAudio);
         return audioSources.current.length - 1; // 返回新音訊的索引
     };

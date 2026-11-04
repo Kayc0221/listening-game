@@ -32,6 +32,9 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
     const [snrRate, setSnrRate] = useState(0);
     const isLoadingAudio = useRef(false);
+    const timers = useRef([]); // 播放後的計時器；換關或離開時要清掉，否則會在下一關提早顯示選項
+    const later = (fn, ms) => timers.current.push(setTimeout(fn, ms));
+    useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
     
 
@@ -61,15 +64,15 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         playAudio(mixedAudioIndex);
         setNewIndex1(mixedAudioIndex);
 
-        setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
+        later(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
 
         // 已經作答過：只是再聽一次
         if (hasCheckedChoices) {
             return;
         }
 
-        setTimeout(() => setShowState(3), 3000);
-        setTimeout(() => {
+        later(() => setShowState(3), 3000);
+        later(() => {
             setShowState(4);
             setStartChoicesAnimation(true);
         }, 5000);
@@ -88,7 +91,8 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             setSnrRate(snrStartValue);
         };
 
-        fetchAndSetSNR();
+        // 每一關開始時抓一次就好：作答後再抓，2-3 秒後回來會蓋掉玩家剛調整的難度
+        if (!hasCheckedChoices) fetchAndSetSNR();
     }, [hasCheckedChoices, username]); // 依赖项数组包含 hasCheckedChoices 和 username
 
 
@@ -138,7 +142,8 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         };
 
         const checkChoicesBtn = () => {
-            if (!hasCheckedChoices) {
+            // 選項出現 (聽過句子) 之前不能確認，否則還沒聽就交出 0 分、用掉這一題
+            if (startChoicesAnimation && !hasCheckedChoices) {
                 setHasCheckedChoices(true);
                 setButtonClicked(false);
                 checkChoices(selected);
@@ -180,7 +185,10 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
     const startNewRound = () => { 
 
+         timers.current.forEach(clearTimeout);
+         timers.current = [];
          setCallCount(prevCount => prevCount + 1); 
+         setWordArray([]); // 上一關的字不要留著 (看不見但還按得到)
          setSelected(new Set());
          setButtonClicked(false);
          setShowWordIndex(-1);
@@ -239,7 +247,7 @@ const ChoiceGrid = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                     <div className="audio-control">
                         <div className={`playButton ${!buttonClicked ? 'showClickme' : ''}`} onClick={handleButtonClick}></div>
                         <AudioAmplitude audio={newIndex1} />
-                        <button className="checkAnsButton" onClick={checkChoicesBtn}>確認選項</button>
+                        <button className="checkAnsButton" onClick={checkChoicesBtn} disabled={!startChoicesAnimation || hasCheckedChoices}>確認選項</button>
 
 
                     </div>

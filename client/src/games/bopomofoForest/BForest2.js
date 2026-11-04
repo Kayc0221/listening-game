@@ -211,8 +211,9 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     return (
         <>
             <div className="game2-container">
+                {/* 8 關、4 顆星：每答一題亮半顆 */}
                 {showState >= 0 && (
-                    <ScoreStarsField state={Math.floor(callCount/2)} numStars={4} className="score-stars-field" />
+                    <ScoreStarsField state={callCount / 2} numStars={4} className="score-stars-field" />
                 )}
 
                 {showState >= 1 && ( 

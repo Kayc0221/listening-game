@@ -20,8 +20,9 @@ export const GAMES = {
     3: {
         name: 'ㄅㄅ森林',
         description: '「 歡迎進入ㄅㄅ森林，在這裡你會聽到許多讀音，有些發音你可能沒有聽過，這並不影響作答。 」',
-        // 前 5 關是兩題一組的 BForest，之後是 gameType 5 的 BForest2
-        levelComponent: (level) => (level >= 5 ? BForest2 : BForest),
+        // gameType 3 的題目用兩題一組的 BForest，gameType 5 的用 BForest2。
+        // 依題號判斷而不是關卡數：題庫快用完時 gameType 3 可能不到 5 題
+        levelComponent: (level, gameId) => (String(gameId).startsWith('5-') ? BForest2 : BForest),
     },
     4: {
         name: '文字海',

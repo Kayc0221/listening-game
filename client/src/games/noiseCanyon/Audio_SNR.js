@@ -29,6 +29,26 @@ async function fetchAudioBuffer(audioContext, filename) {
     }
 }
 
+// 噪音檔 (530 KB) 每次播放都一樣：解碼結果與各聲道的功率只算一次
+const noiseCache = {};
+const loadNoise = async (audioContext, filename) => {
+    if (!noiseCache[filename]) {
+        noiseCache[filename] = fetchAudioBuffer(audioContext, filename).then((buffer) => ({
+            buffer,
+            power: Array.from({ length: buffer.numberOfChannels }, (_, c) => {
+                const data = buffer.getChannelData(c);
+                let sum = 0;
+                for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+                return sum / data.length;
+            }),
+        })).catch((error) => {
+            delete noiseCache[filename];
+            throw error;
+        });
+    }
+    return noiseCache[filename];
+};
+
 export async function createMixedAudio(signalFilename, noiseFilename, SNR) {
     // 只用來解碼與建立 buffer；用完要關閉，否則每播一次就多一個沒釋放的 AudioContext
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -41,7 +61,7 @@ export async function createMixedAudio(signalFilename, noiseFilename, SNR) {
 
 async function mixAtSNR(audioContext, signalFilename, noiseFilename, SNR) {
     const signalBuffer = await fetchAudioBuffer(audioContext, signalFilename);
-    const noiseBuffer = await fetchAudioBuffer(audioContext, noiseFilename);
+    const { buffer: noiseBuffer, power: noisePowers } = await loadNoise(audioContext, noiseFilename);
 
     const numberOfChannels = Math.min(signalBuffer.numberOfChannels, noiseBuffer.numberOfChannels);
     const minLength = Math.min(signalBuffer.length, noiseBuffer.length);
@@ -57,7 +77,7 @@ async function mixAtSNR(audioContext, signalFilename, noiseFilename, SNR) {
         const outputData = outputBuffer.getChannelData(channel);
 
         const signalPower = signalData.reduce((acc, val) => acc + val * val, 0) / signalData.length;
-        const noisePower = noiseData.reduce((acc, val) => acc + val * val, 0) / noiseData.length;
+        const noisePower = noisePowers[channel];
 
         const scalingFactor = Math.sqrt((signalPower / noisePower) * Math.pow(10, -SNR / 10));
 

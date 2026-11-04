@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
 import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
-import { ApiError, getPlayedGames, selectRandomGames } from '../api';
+import { ApiError, getPlayedGames, selectRandomGames, waitForPendingScores } from '../api';
 import { asset } from '../asset';
 import { TOTAL_SESSIONS, completedSessions, countedLevels } from '../progress';
 
@@ -108,7 +108,7 @@ const GameSelector = ({ username }) => {
 
     const handleGameEnd = () => {
         setShowExpandedGame(false);
-        refreshProgress();
+        waitForPendingScores().then(refreshProgress); // 最後一關的分數寫完再更新燃料
         if (!availableGames.length) {
             setGameRounds(4);
             return;
@@ -123,7 +123,8 @@ const GameSelector = ({ username }) => {
     useEffect(() => {
         if (gameRounds !== 4) return;
         setBackground(asset(`/image/hint.jpg`));
-        getPlayedGames(username)
+        waitForPendingScores()
+            .then(() => getPlayedGames(username))
             .then((data) => setIsJourneyComplete(completedSessions(countedLevels(data.playedGames)) >= TOTAL_SESSIONS))
             .catch((error) => console.error('Error fetching played games:', error));
     }, [gameRounds]);
@@ -137,6 +138,8 @@ const GameSelector = ({ username }) => {
         // 先公平地抽好要停在哪個遊戲，輪盤轉夠久之後再轉到它才停下
         // (之前停在哪裡由轉動時間決定，各遊戲機率不平均，第一輪常常停在同一個遊戲)
         const targetGame = availableGames[Math.floor(Math.random() * availableGames.length)];
+        let cancelled = false; // 轉動中登出時停止，避免之後的 prepareGame 影響下一個登入的人
+        let timer;
 
 
         const runAnimation = () => {
@@ -147,7 +150,7 @@ const GameSelector = ({ username }) => {
 
             if (elapsedTime < totalTime || currentGame !== targetGame) {
                 speed += (15 + Math.random() * 10);  // 逐漸變慢
-                setTimeout(runAnimation, speed);
+                timer = setTimeout(() => { if (!cancelled) runAnimation(); }, speed);
             } else {
                 setCanConfirm(true);
                 setIsAnimating(false);
@@ -162,6 +165,10 @@ const GameSelector = ({ username }) => {
         if (isAnimating) {
             runAnimation();
         }
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
     }, [isAnimating]);
 
     useEffect(() => {

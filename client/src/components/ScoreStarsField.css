@@ -1,42 +1,10 @@
+/* 寬度與每顆星星的位置由 ScoreStarsField.js 依星星數量計算 (vmin，任何螢幕比例都不會重疊) */
 .star-field {
     position: relative;
-    height: 10vh; /* 例如，将高度设置为视窗高度的10% */
-    width: 20vw; /* 将宽度设置为视窗宽度的30% */
+    height: 10vmin;
     z-index: 1000;
 }
 
 .star-item {
     position: absolute;
 }
-
-.star-0 {
-    left: 0%; /* 基于.star-field宽度的百分比 */
-    top: 0%; /* 基于.star-field高度的百分比，这里使用0%作为示例 */
-}
-
-.star-1 {
-    left: 33.33%; /* 将位置设为.star-field宽度的33.33% */
-    top: -5vh; /* 超出.star-field顶部的距离，根据需要使用视窗高度的百分比 */
-}
-
-.star-2 {
-    left: 66.66%; /* 将位置设为.star-field宽度的66.66% */
-    top: 0%; /* 同上，基于.star-field高度的百分比 */
-}
-
-.star-3 {
-    left: 33.33%; /* 与.star-1在同一水平位置 */
-    top: 3vh; /* 设置为视窗高度的百分比 */
-}
-
-/* 5 顆星 (ㄅㄅ森林前段，一關一顆)：排成弧形，欄位加寬讓星星 (10vmin) 不重疊 */
-/* 星星本身是 10vmin，所以間距和高度也用 vmin，任何螢幕比例都不會重疊或超出畫面上緣 */
-.star-field.stars-5 {
-    width: 54vmin;
-}
-
-.stars-5 .star-0 { left: 0; top: 0; }
-.stars-5 .star-1 { left: 11vmin; top: -2vmin; }
-.stars-5 .star-2 { left: 22vmin; top: -3vmin; }
-.stars-5 .star-3 { left: 33vmin; top: -2vmin; }
-.stars-5 .star-4 { left: 44vmin; top: 0; }

@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { useSpring, animated } from 'react-spring';
 
-function ShinyStar({ active }) {
+// fill：0 = 沒亮、1 = 整顆亮，中間的值只亮左邊一部分 (例如 0.5 = 半顆星)
+function ShinyStar({ fill = 0 }) {
+    const active = fill >= 1;
+    const clipId = useId();
     const [size, setSize] = useState(Math.min(window.innerWidth, window.innerHeight) * 0.1); // 假设我们基于视窗大小的20%来设置大小
     const [haloSize, setHaloSize] = useState(0);
 
@@ -22,9 +25,10 @@ function ShinyStar({ active }) {
     }, [active, size]);
 
     const baseProps = useSpring({
-        opacity: active ? 1 : 0.1,
+        opacity: active ? 1 : fill > 0 ? 0.6 : 0.1,
         config: { duration: 1000 },
     });
+    const fillProps = useSpring({ width: size * Math.min(fill, 1), config: { duration: 1000 } });
 
     const haloProps = useSpring({
         r: haloSize,
@@ -83,6 +87,22 @@ function ShinyStar({ active }) {
                 strokeWidth={`${size / 50}px`} // 动态描边宽度
                 style={baseProps}
             />
+
+            {/* 部分亮起：金色星星只顯示左邊 fill 的比例 */}
+            {fill > 0 && !active && (
+                <>
+                    <clipPath id={clipId}>
+                        <animated.rect x="0" y="0" height={size} width={fillProps.width} />
+                    </clipPath>
+                    <polygon
+                        points={points}
+                        fill="gold"
+                        stroke="black"
+                        strokeWidth={`${size / 50}px`}
+                        clipPath={`url(#${clipId})`}
+                    />
+                </>
+            )}
         </svg>
     );
 }

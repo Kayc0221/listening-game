@@ -23,8 +23,10 @@ const useLevelData = (selectedGames) => {
                 if (loaded.current[id]) continue;
                 try {
                     const data = await getGameData(id);
+                    // 已取消 (例如按了重試) 的那一輪拿到的資料不能標成已載入，否則新的一輪會跳過它，畫面一直停在載入中
+                    if (cancelled) return;
                     loaded.current[id] = true;
-                    if (!cancelled) setLevelData((prev) => ({ ...prev, [id]: data }));
+                    setLevelData((prev) => ({ ...prev, [id]: data }));
                 } catch (error) {
                     console.error("Failed to fetch game data:", error);
                     if (!cancelled) setLevelData((prev) => ({ ...prev, [id]: LOAD_FAILED }));
@@ -98,7 +100,7 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
     if (!game) {
         return <div>未知的遊戲</div>;
     }
-    const Level = game.levelComponent(currentLevel);
+    const Level = game.levelComponent(currentLevel, selectedGames[currentLevel]);
 
     // 只用「這一關」的題目。還在下載時：同一個元件先沿用上一關的資料 (保留星星等進度) 但蓋上載入畫面擋住操作；
     // 換成另一個元件 (例如 ㄅㄅ森林 第 6 關換成 BForest2) 時不能沿用，否則資料格式不同會當掉

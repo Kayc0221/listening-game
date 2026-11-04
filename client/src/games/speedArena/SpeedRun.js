@@ -87,22 +87,15 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         }
 
 
-        pauseAudio(0);
-        
-        const Audio2_Idx = await addAudio(`game2/${choicedGamedata[2]}-1.wav`, false);
-        const Audio3_Idx = await addAudio(`game2/${choicedGamedata[2]}-2.wav`, false);
+        // 只建立要播的那一個音檔 (之前每按一次都建立兩個，另一個下載後從不播放也不釋放)
+        const isFirstClip = (randomOrder === 'AB' && buttonType === 'A') || (randomOrder === 'BA' && buttonType === 'B');
+        if (isFirstClip ? aPlayed : bPlayed) return;
 
-        if ((randomOrder === 'AB' && buttonType === 'A') || (randomOrder === 'BA' && buttonType === 'B')) {
-            if (aPlayed) return;
-            await playAudio(Audio2_Idx, 1);
-            setAPlayed(true);
-            setNewIndex1(Audio2_Idx);
-        } else {
-            if (bPlayed) return;
-            await playAudio(Audio3_Idx, 1);
-            setBPlayed(true);
-            setNewIndex1(Audio3_Idx);
-        }
+        pauseAudio(0);
+        const clipIdx = addAudio(`game2/${choicedGamedata[2]}-${isFirstClip ? 1 : 2}.wav`, false);
+        await playAudio(clipIdx, 1);
+        if (isFirstClip) setAPlayed(true); else setBPlayed(true);
+        setNewIndex1(clipIdx);
     };
 
     useEffect(() => {
@@ -137,7 +130,8 @@ const SpeedRun = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             setPlaybackRate(newPlaybackRate); // 假设您已经定义了 setPlaybackRate 更新播放速度的状态
         };
     
-        fetchAndSetPlaybackRate();
+        // 每一關開始時抓一次就好：作答後再抓，2-3 秒後回來會蓋掉玩家剛調整的語速
+        if (!hasCheckedChoices) fetchAndSetPlaybackRate();
     }, [hasCheckedChoices, username]);
 
 
