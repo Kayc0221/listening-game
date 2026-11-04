@@ -5,12 +5,15 @@
     z-index: 1000;
     display: flex;
     align-items: center;
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(10, 14, 30, 0.5); /* 看得出是操作元件，不會和背景的怪獸混在一起 */
 }
 
     .volume-container img {
-        width: 48px;
-        height: 48px;
-        margin-right: 20px;
+        width: 36px;
+        height: 36px;
+        margin-right: 12px;
         filter: invert(100%); /* 反白效果，將 100% 表示完全反白 */
     }
 

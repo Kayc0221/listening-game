@@ -93,6 +93,15 @@
     }
 }
 
+/* 遊戲進行中：背景中央壓暗，四周保留背景圖 */
+.level-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    pointer-events: none;
+    background: radial-gradient(ellipse 62% 70% at 50% 32%, rgba(8, 12, 28, 0.68) 0%, rgba(8, 12, 28, 0.52) 55%, rgba(8, 12, 28, 0) 100%);
+}
+
 /* 題目載入中 / 載入失敗 / 這一關出錯 */
 .level-status {
     padding: 3vmin 5vmin;

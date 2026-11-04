@@ -41,9 +41,8 @@ const AudioVisualizer = ({ audioIndex }) => {
 
             analyser.getByteTimeDomainData(dataArray);
 
-            // Clear canvas with semi-transparent background
-            ctx.fillStyle = 'rgba(200, 200, 200, 0.2)';
-            ctx.fillRect(0, 0, width, height);
+            // 每一幀清空 (之前疊半透明灰色，看起來像一個空的輸入框)
+            ctx.clearRect(0, 0, width, height);
 
             // Draw waveform
             ctx.lineWidth = 3;
@@ -87,7 +86,7 @@ const AudioVisualizer = ({ audioIndex }) => {
         };
     }, [audioIndex, analyser, getCurrentAudioTime, getAudioDuration, dimensions]);  // Include dimensions in dependency array
 
-    return <canvas ref={canvasRef} width={dimensions.width} height={dimensions.height} style={{ border: '1px solid #ddd', maxWidth: '100%' }} />;
+    return <canvas ref={canvasRef} width={dimensions.width} height={dimensions.height} style={{ borderRadius: '1.5vmin', background: 'rgba(0, 0, 0, 0.25)', maxWidth: '100%' }} />;
 };
 
 export default AudioVisualizer;

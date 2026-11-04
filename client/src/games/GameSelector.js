@@ -212,19 +212,31 @@ const GameSelector = ({ username }) => {
                 <>
                     <div className="game-icons-container fade-in-and-grow">
                         <div className="game-row">
-                            <img src={asset('/image/game1.jpg')} alt="Game Icon 1" className={`game-icon ${selectedGame === 1 ? 'highlight' : ''} ${!availableGames.includes(1) ? 'disabled' : ''}`} />
-                            <img src={asset('/image/game2.jpg')} alt="Game Icon 2" className={`game-icon ${selectedGame === 2 ? 'highlight' : ''} ${!availableGames.includes(2) ? 'disabled' : ''}`} />
+                            <div className="game-tile">
+                                <img src={asset('/image/game1.jpg')} alt={GAMES[1].name} className={`game-icon ${selectedGame === 1 ? 'highlight' : ''} ${!availableGames.includes(1) ? 'disabled' : ''}`} />
+                                <span className="game-tile-name">{GAMES[1].name}</span>
+                            </div>
+                            <div className="game-tile">
+                                <img src={asset('/image/game2.jpg')} alt={GAMES[2].name} className={`game-icon ${selectedGame === 2 ? 'highlight' : ''} ${!availableGames.includes(2) ? 'disabled' : ''}`} />
+                                <span className="game-tile-name">{GAMES[2].name}</span>
+                            </div>
                         </div>
                         <div className="game-row">
-                            <img src={asset('/image/game3.jpg')} alt="Game Icon 3" className={`game-icon ${selectedGame === 3 ? 'highlight' : ''} ${!availableGames.includes(3) ? 'disabled' : ''}`} />
-                            <img src={asset('/image/game4.jpg')} alt="Game Icon 4" className={`game-icon ${selectedGame === 4 ? 'highlight' : ''} ${!availableGames.includes(4) ? 'disabled' : ''}`} />
+                            <div className="game-tile">
+                                <img src={asset('/image/game3.jpg')} alt={GAMES[3].name} className={`game-icon ${selectedGame === 3 ? 'highlight' : ''} ${!availableGames.includes(3) ? 'disabled' : ''}`} />
+                                <span className="game-tile-name">{GAMES[3].name}</span>
+                            </div>
+                            <div className="game-tile">
+                                <img src={asset('/image/game4.jpg')} alt={GAMES[4].name} className={`game-icon ${selectedGame === 4 ? 'highlight' : ''} ${!availableGames.includes(4) ? 'disabled' : ''}`} />
+                                <span className="game-tile-name">{GAMES[4].name}</span>
+                            </div>
                         </div>
                     </div>
                     <div className="controls">
                         {gameRounds === 0 && !canConfirm && (
                             <div className="button-container fade-in-and-grow">
-                                <div className="game-button start-button" onClick={startGameAnimation}></div>
-                                <div className="game-button exit-button" onClick={exitGame}></div>
+                                <div className="game-button start-button" onClick={startGameAnimation}>遊戲開始</div>
+                                <div className="game-button exit-button" onClick={exitGame}>退出遊戲</div>
                             </div>
                         )}
                         <div className="text-container ">
@@ -260,7 +272,7 @@ const GameSelector = ({ username }) => {
                         <AnimatedTitle text={`「小怪獸成功在今天的冒險中找到了一些燃料，但還不足以發射火箭，還請同學多多幫忙小怪獸尋找燃料，讓他可以早日回家😄」`} />
                     </div>
                     <div className="button-container fade-in-and-grow">
-                        <div className="game-button exit-button" onClick={exitGame}></div>
+                        <div className="game-button exit-button" onClick={exitGame}>退出遊戲</div>
                     </div>
                 </>
             )}
@@ -276,7 +288,7 @@ const GameSelector = ({ username }) => {
                         <AnimatedTitle text={`「小怪獸的飛行器填充完燃料，可以踏上返家的旅程，也感謝同學一路來的幫助，在這幾週一起成長，遊戲雖然結束，但同學還是要把握機會繼續增進自己的能力😄」`} />
                     </div>
                     <div className="button-container fade-in-and-grow">
-                        <div className="game-button exit-button" onClick={exitGame}></div>
+                        <div className="game-button exit-button" onClick={exitGame}>退出遊戲</div>
                     </div>
                 </>
             )}

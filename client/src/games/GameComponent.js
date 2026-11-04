@@ -123,6 +123,8 @@ const GameComponent = ({ gameType, selectedGames, username, onGameEnd }) => {
 
     return (
         <>
+            {/* 遊戲進行中在背景圖上加一層暗色漸層，題目和按鈕才不會被花俏的背景吃掉 */}
+            {isGameStarted && !showExpandedTips && <div className="level-backdrop" />}
             {/* 顯示小訣竅時移除遊戲畫面：否則最後一關看不見的選項按鈕會蓋在小訣竅上，擋住「點擊後繼續」 */}
             {!showExpandedTips && <div className="game-container">
                 <div className="fade-in-and-grow">

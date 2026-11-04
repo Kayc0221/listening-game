@@ -25,7 +25,7 @@ function ShinyStar({ fill = 0 }) {
     }, [active, size]);
 
     const baseProps = useSpring({
-        opacity: active ? 1 : fill > 0 ? 0.6 : 0.1,
+        opacity: active ? 1 : fill > 0 ? 0.75 : 0.4, // 沒亮的星星之前只有 0.1，在背景上幾乎看不見
         config: { duration: 1000 },
     });
     const fillProps = useSpring({ width: size * Math.min(fill, 1), config: { duration: 1000 } });
@@ -82,7 +82,7 @@ function ShinyStar({ fill = 0 }) {
             {/* 主星星 */}
             <animated.polygon
                 points={points}
-                fill={active ? "gold" : "grey"}
+                fill={active ? "gold" : "#c9ced6"}
                 stroke="black"
                 strokeWidth={`${size / 50}px`} // 动态描边宽度
                 style={baseProps}

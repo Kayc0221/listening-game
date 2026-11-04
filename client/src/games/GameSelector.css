@@ -28,16 +28,33 @@
 }
 
 
+.game-tile {
+    margin: 1.2vmin 2vmin;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8vmin;
+}
+
 .game-icon {
-    margin: 20px;
-    flex-basis: calc(50% - 40px);
-    width: 17.5vw; /* 更改此行 */
+    width: 17.5vw;
     height: auto;
+    border-radius: 1.2vmin;
+    transition: box-shadow 0.15s, transform 0.15s;
+}
+
+/* 遊戲名稱：沒有名稱時只看圖片很難知道是哪個遊戲 */
+.game-tile-name {
+    color: #fff;
+    font-size: 2.6vmin;
+    font-weight: bold;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 4px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .highlight {
-    border: 3px white;
-    box-shadow: 0px 0px 10px 5px white;
+    box-shadow: 0 0 0 0.5vmin #ffe08a, 0 0 3vmin 1vmin rgba(255, 224, 138, 0.85);
+    transform: scale(1.04);
 }
 
 .outer-container {
@@ -86,16 +103,23 @@
 .button-container {
     position: absolute;
     right: 11.7vw;
-    bottom: 13.9vh;
+    bottom: 25vh; /* 在下方訊息列的上面，不會和訊息重疊 */
     display: flex;
     flex-direction: column;
-    gap: 60px;
+    gap: 3.5vmin;
 }
 
+/* 文字按鈕 (之前是藍綠色的圖片，和畫面的暖色調不搭) */
 .game-button {
     z-index: 50;
-    width: 13.7vw;
-    height: 11.1vh;
+    min-width: 24vmin;
+    padding: 2vmin 3vmin;
+    border-radius: 999px;
+    font-size: 3.4vmin;
+    font-weight: bold;
+    letter-spacing: 0.15em;
+    text-align: center;
+    user-select: none;
     cursor: pointer;
     transition: transform 0.2s;
 }
@@ -109,26 +133,32 @@
     }
 
 .start-button {
-    background-image: url('../../public/image/icon/start-game.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    color: #4a2c05;
+    background: linear-gradient(#ffe8a3, #ffb547);
+    box-shadow: 0 0.7vmin 0 #c47a16, 0 1.2vmin 2.4vmin rgba(0, 0, 0, 0.45);
 }
 
 .exit-button {
-    background-image: url('../../public/image/icon/exit-game.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+    color: #1f2d45;
+    background: linear-gradient(#f1f5fb, #b9c7da);
+    box-shadow: 0 0.7vmin 0 #7c8ba2, 0 1.2vmin 2.4vmin rgba(0, 0, 0, 0.45);
 }
 .text-container {
     position: absolute;
     bottom: 15vh; /* 調整這個值來更改距離底部的位置 */
     left: 50%;
     transform: translate(-50%, 0);
+    max-width: 60vw;
+    padding: 0 3vmin;
+    border-radius: 2vmin;
+    background: rgba(10, 14, 30, 0.55); /* 文字底色：直接疊在怪獸和雪地上很難讀 */
     color: white;
     font-size: 1.3rem;
     text-align: center;
+}
+
+.text-container h1 {
+    margin: 1.5vmin 0;
 }
 .endgame-text-container {
     position: absolute;

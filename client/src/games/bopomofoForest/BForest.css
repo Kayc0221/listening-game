@@ -19,18 +19,21 @@
 }
 
 .grid-container3 button {
-    width: 4vw; /* 使用视口宽度的百分比 */
-    height: 4vw; /* 保持宽高一致 */
-    min-width: 40px; /* 设置最小宽度 */
-    min-height: 40px; /* 设置最小高度 */
-    border-radius: 50%; /* 圆形按钮 */
-    background-color: rgb(89, 95, 100); /* 按钮背景颜色 */
-    color: white; /* 文本颜色 */
-    border: none;
+    /* 放大並提高對比：注音的聲調符號 (ˇ ˋ ˊ) 太小會分不出來 */
+    width: 9vmin;
+    height: 9vmin;
+    min-width: 56px;
+    min-height: 56px;
+    border-radius: 50%;
+    background: #fff6df;
+    color: #2a2a2a;
+    border: 0.5vmin solid #ffc65c;
+    box-shadow: 0 0.6vmin 1.6vmin rgba(0, 0, 0, 0.45);
     cursor: pointer;
-    font-size: 1.5rem; /* 文本大小 */
-    transition: transform 0.3s ease ; /* 过渡动画 */
-}   
+    font-size: 3.8vmin;
+    font-weight: bold;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
 .grid-container3 button:hover {
     transform: scale(1.1); /* 鼠标悬停时放大按钮 */
