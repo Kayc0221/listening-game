@@ -13,6 +13,8 @@
 // 每個 gameType 一次冒險要玩幾關
 var LEVELS_PER_GAME = { '1': 3, '2': 4, '3': 5, '4': 2, '5': 8 };
 var DEFAULT_AVERAGE_SCORE = 5;
+// 每位學生的統計 (玩過的題目、分數總和) 存在 CacheService，不用每次請求都讀整張 scores 工作表
+var SUMMARY_TTL_SECONDS = 21600; // 6 小時 (CacheService 的上限)；過期後下一次請求會重新讀表
 
 // ---- HTTP 入口 ----
 
@@ -80,11 +82,7 @@ function getTip_(tipClass) {
 }
 
 function getPlayedGames_(username) {
-  var played = {};
-  readTable_('scores').forEach(function (s) {
-    if (String(s.username) === String(username)) played[String(s.gameId)] = true;
-  });
-  return Object.keys(played);
+  return Object.keys(userSummary_(username).played);
 }
 
 // 從這個 gameType 還沒玩過的題目中隨機挑幾關；全部玩過時回傳 404
@@ -101,12 +99,8 @@ function selectRandomGames_(username, gameType) {
 
 // 所有已記錄分數 (0-10) 的平均，用來調整難度
 function getAverageScore_(username) {
-  var scores = readTable_('scores')
-    .filter(function (s) { return String(s.username) === String(username); })
-    .map(function (s) { return Number(s.score); })
-    .filter(function (n) { return !isNaN(n); });
-  if (!scores.length) return DEFAULT_AVERAGE_SCORE;
-  return scores.reduce(function (a, b) { return a + b; }, 0) / scores.length;
+  var summary = userSummary_(username);
+  return summary.count ? summary.sum / summary.count : DEFAULT_AVERAGE_SCORE;
 }
 
 // scoreInfo 格式沿用舊後端："<gameId> : <score>"
@@ -118,10 +112,72 @@ function updateScore_(username, scoreInfo) {
   lock.waitLock(10000);
   try {
     appendTextRow_('scores', [new Date(), username, match[1], Number(match[2])], ['yyyy-mm-dd hh:mm:ss', '@', '@', '0.##']);
+    // 快取裡有這位學生的統計就順便更新；沒有的話下一次讀取時會從工作表重建 (已包含這一筆)
+    var cache = CacheService.getScriptCache();
+    var cached = cache.get(summaryKey_(username));
+    if (cached) {
+      var summary = JSON.parse(cached);
+      addScoreToSummary_(summary, match[1], match[2]);
+      cache.put(summaryKey_(username), JSON.stringify(summary), SUMMARY_TTL_SECONDS);
+    }
   } finally {
     lock.releaseLock();
   }
   return { success: true };
+}
+
+// ---- 每位學生的統計快取 ----
+
+function summaryKey_(username) {
+  return 'summary:' + String(username);
+}
+
+function addScoreToSummary_(summary, gameId, score) {
+  summary.played[String(gameId)] = 1;
+  var n = Number(score);
+  if (!isNaN(n)) {
+    summary.sum += n;
+    summary.count += 1;
+  }
+}
+
+// { played: { gameId: 1, ... }, sum, count }；快取沒有時讀一次 scores 工作表重建。
+// 重建和寫入分數都在同一把鎖裡進行，重建時不會漏掉同時寫入的分數
+function userSummary_(username) {
+  var cache = CacheService.getScriptCache();
+  var cached = cache.get(summaryKey_(username));
+  if (cached) return JSON.parse(cached);
+
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    cached = cache.get(summaryKey_(username));
+    if (cached) return JSON.parse(cached);
+    var summary = { played: {}, sum: 0, count: 0 };
+    readTable_('scores').forEach(function (s) {
+      if (String(s.username) === String(username)) addScoreToSummary_(summary, s.gameId, s.score);
+    });
+    cache.put(summaryKey_(username), JSON.stringify(summary), SUMMARY_TTL_SECONDS);
+    return summary;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 手動修改或刪除 scores / users 工作表後清除快取，否則最多 6 小時內還會用舊的統計
+function clearSummaryCache() {
+  var keys = readTable_('users').map(function (u) { return summaryKey_(u.username); });
+  if (keys.length) CacheService.getScriptCache().removeAll(keys);
+}
+
+// 在試算表上手動編輯 scores 或 users 時自動清除快取 (程式寫入不會觸發)
+function onEdit(e) {
+  try {
+    var name = e && e.range && e.range.getSheet().getName();
+    if (name === 'scores' || name === 'users') clearSummaryCache();
+  } catch (err) {
+    // 清除失敗也不影響編輯；可以從選單「清除成績快取」手動清除
+  }
 }
 
 // ---- 試算表工具 ----
@@ -189,6 +245,7 @@ function onOpen() {
     .createMenu('遊戲管理')
     .addItem('新增 / 重設學生帳號', 'promptAddUser')
     .addItem('建立 / 修正工作表', 'setupSheets')
+    .addItem('清除成績快取 (手動修改成績後)', 'clearSummaryCache')
     .addToUi();
 }
 

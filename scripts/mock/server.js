@@ -80,6 +80,17 @@ const context = {
     computeDigest: (alg, text) => Array.from(crypto.createHash(alg).update(text, 'utf8').digest(), (b) => (b > 127 ? b - 256 : b)),
   },
   LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
+  // 記憶體中的快取 (不模擬過期時間)
+  CacheService: (() => {
+    const store = new Map();
+    const cache = {
+      get: (key) => (store.has(key) ? store.get(key) : null),
+      put: (key, value) => { store.set(key, String(value)); },
+      remove: (key) => { store.delete(key); },
+      removeAll: (keys) => { keys.forEach((key) => store.delete(key)); },
+    };
+    return { getScriptCache: () => cache };
+  })(),
   console,
 };
 vm.createContext(context);
