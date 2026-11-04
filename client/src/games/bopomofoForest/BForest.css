@@ -20,11 +20,13 @@
 
 .grid-container3 button {
     /* 放大並提高對比：注音的聲調符號 (ˇ ˋ ˊ) 太小會分不出來 */
-    width: 9vmin;
-    height: 9vmin;
-    min-width: 56px;
-    min-height: 56px;
-    border-radius: 50%;
+    /* 寬度隨內容變長：ㄅㄅ森林後段的答案是整個音節 (例如 ㄒㄧㄢ)，固定寬度會折行、字跑出按鈕；單一字元時仍是圓形 */
+    width: auto;
+    min-width: max(9vmin, 56px);
+    height: max(9vmin, 56px);
+    padding: 0 2vmin;
+    white-space: nowrap;
+    border-radius: 999px;
     background: #fff6df;
     color: #2a2a2a;
     border: 0.5vmin solid #ffc65c;

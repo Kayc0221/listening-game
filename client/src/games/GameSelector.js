@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import GameComponent from './GameComponent';
 import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
+import JackpotBurst from '../components/JackpotBurst';
 import { ApiError, getPlayedGames, selectRandomGames, waitForPendingScores } from '../api';
 import { asset } from '../asset';
 import { TOTAL_SESSIONS, completedSessions, countedLevels } from '../progress';
@@ -22,6 +23,7 @@ const GameSelector = ({ username }) => {
     const [gameRounds, setGameRounds] = useState(0); // 今天已經玩完幾個遊戲；4 = 今天的冒險結束
     const [notice, setNotice] = useState(null); // 暫時取代輪盤下方訊息的提示 (例如某個遊戲沒有題目)
     const [isJourneyComplete, setIsJourneyComplete] = useState(false);
+    const [winner, setWinner] = useState(null); // 輪盤剛停下的遊戲：顯示中獎動畫
 
     const [availableGames, setAvailableGames] = useState([1, 2, 3, 4]);
     const { pauseAudio, removeAudio } = useAudio();
@@ -36,7 +38,7 @@ const GameSelector = ({ username }) => {
     }, []);
 
     const startGameAnimation = () => {
-        //pauseAudio(0);
+        setWinner(null);
         setIsAnimating(true);
         //setCanConfirm(false);
     };
@@ -154,6 +156,7 @@ const GameSelector = ({ username }) => {
             } else {
                 setCanConfirm(true);
                 setIsAnimating(false);
+                setWinner(currentGame);
 
                 // 移除選擇的遊戲，然後準備它的題目
                 const remainingGames = availableGames.filter(game => game !== currentGame);
@@ -172,6 +175,7 @@ const GameSelector = ({ username }) => {
     }, [isAnimating]);
 
     useEffect(() => {
+        if (showExpandedGame) setWinner(null); // 遊戲畫面展開後收起中獎動畫
         if (showExpandedGame) {
             const timer = setTimeout(() => {
                 setBackground(asset(`/image/game${selectedGame}.jpg`));
@@ -211,26 +215,19 @@ const GameSelector = ({ username }) => {
             {gameRounds < 4 && (
                 <>
                     <div className="game-icons-container fade-in-and-grow">
-                        <div className="game-row">
-                            <div className="game-tile">
-                                <img src={asset('/image/game1.jpg')} alt={GAMES[1].name} className={`game-icon ${selectedGame === 1 ? 'highlight' : ''} ${!availableGames.includes(1) ? 'disabled' : ''}`} />
-                                <span className="game-tile-name">{GAMES[1].name}</span>
+                        {[[1, 2], [3, 4]].map((row) => (
+                            <div className="game-row" key={row.join('-')}>
+                                {row.map((n) => (
+                                    <div className={`game-tile ${winner === n ? 'is-winner' : ''}`} key={n}>
+                                        <span className="game-icon-wrap">
+                                            <img src={asset(`/image/game${n}.jpg`)} alt={GAMES[n].name} className={`game-icon ${selectedGame === n ? 'highlight' : ''} ${!availableGames.includes(n) && winner !== n ? 'disabled' : ''}`} />
+                                            {winner === n && <JackpotBurst />}
+                                        </span>
+                                        <span className="game-tile-name">{GAMES[n].name}</span>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="game-tile">
-                                <img src={asset('/image/game2.jpg')} alt={GAMES[2].name} className={`game-icon ${selectedGame === 2 ? 'highlight' : ''} ${!availableGames.includes(2) ? 'disabled' : ''}`} />
-                                <span className="game-tile-name">{GAMES[2].name}</span>
-                            </div>
-                        </div>
-                        <div className="game-row">
-                            <div className="game-tile">
-                                <img src={asset('/image/game3.jpg')} alt={GAMES[3].name} className={`game-icon ${selectedGame === 3 ? 'highlight' : ''} ${!availableGames.includes(3) ? 'disabled' : ''}`} />
-                                <span className="game-tile-name">{GAMES[3].name}</span>
-                            </div>
-                            <div className="game-tile">
-                                <img src={asset('/image/game4.jpg')} alt={GAMES[4].name} className={`game-icon ${selectedGame === 4 ? 'highlight' : ''} ${!availableGames.includes(4) ? 'disabled' : ''}`} />
-                                <span className="game-tile-name">{GAMES[4].name}</span>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                     <div className="controls">
                         {gameRounds === 0 && !canConfirm && (
