@@ -7,7 +7,7 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
-    const [background, setBackground] = useState(asset('/image/main-menu.png'));
+    const [background, setBackground] = useState(asset('/image/main-menu.jpg'));
     const [shownTips, setShownTips] = useState([]); // 新增 shownTips 狀態
     const [progressVersion, setProgressVersion] = useState(0); // 改變時 ProgressBar 重新讀取進度
     const refreshProgress = () => setProgressVersion((v) => v + 1);

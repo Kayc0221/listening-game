@@ -43,6 +43,7 @@ const AudioAmplitude = ({ index }) => {
         const totalBars = maxIndex - minIndex;
         const barWidth = WIDTH / totalBars;
 
+        let frame;
         const draw = () => {
             analyser.getByteFrequencyData(dataArray);
 
@@ -60,10 +61,12 @@ const AudioAmplitude = ({ index }) => {
                 ctx.fillRect((i - minIndex) * barWidth, HEIGHT - scaledBarHeight, barWidth, scaledBarHeight);
             }
 
-            requestAnimationFrame(draw);
+            frame = requestAnimationFrame(draw);
         };
 
         draw();
+        // 離開畫面或尺寸改變時停止舊的繪圖迴圈：之前沒有停止，每一關、每次縮放視窗都會多一個迴圈一直跑，越玩越卡
+        return () => cancelAnimationFrame(frame);
     }, [analyser, index, dimensions]); // 确保dimensions改变时重新绘制
 
     return <canvas ref={canvasRef} />;

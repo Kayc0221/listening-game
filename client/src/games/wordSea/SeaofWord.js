@@ -34,7 +34,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [target, setTarget] = useState('');
     const [showTarget, setShowTarget] = useState(true);
     const [hasCheckedChoices, setHasCheckedChoices] = useState(false);
-    const [oneMoreRound, setOneMoreRound] = useState(false);
 
     
 
@@ -159,6 +158,7 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         
 
         const toggleChoice = (choice) => {
+            if (hasCheckedChoices) return; // 答案已經顯示，不能再改選
             const newSelected = new Set(selected);
 
             if (newSelected.has(choice)) {
@@ -206,22 +206,9 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
             const score = correct.size/Difficulty*10;
 
-            // 只記錄第一次作答的分數 (全對也要記，否則這題會被當成沒玩過、之後又被抽到)
-            if (!oneMoreRound) {
-                submitScore(username, choicedGamedata[2], score);
-            }
-
-            if (score !== 10 && !oneMoreRound) {
-                setOneMoreRound(true);
-                setSelected(new Set());
-                setCorrectChoices(new Set());
-                setIncorrectChoices(new Set());
-                setMissedChoices(new Set());
-                setShowTarget(true);
-            }else{
-                setHasCheckedChoices(true);  // 標記已經進行過結算
-                setOneMoreRound(false);
-            }
+            // 作答完立刻顯示對錯與正確答案 (之前答錯會先要求再聽一次，不顯示答案)
+            submitScore(username, choicedGamedata[2], score);
+            setHasCheckedChoices(true);  // 標記已經進行過結算
             setIsGameEnded(true);
 
     };
@@ -241,7 +228,6 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
         setAns('');
         setTarget('');
         setShowTarget(false);
-        setOneMoreRound(false);
 
          setIsLevelCompleted(true);
         // 重置遊戲結束標記
@@ -316,11 +302,9 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                         >
                             <div className="grid-item-content">
                                 {word}
-                                {!oneMoreRound && <>
-                                    {correctChoices.has(word) && <span className="tick" style={{ color: 'green' }}>✓</span>}
-                                    {incorrectChoices.has(word) && <span className="cross" style={{ color: 'red' }}>✗</span>}
-                                    {missedChoices.has(word) && <span className="missed" style={{ color: '#cf0808' }}>O</span>}
-                                </>}
+                                {correctChoices.has(word) && <span className="tick" style={{ color: 'green' }}>✓</span>}
+                                {incorrectChoices.has(word) && <span className="cross" style={{ color: 'red' }}>✗</span>}
+                                {missedChoices.has(word) && <span className="missed" style={{ color: '#cf0808' }}>O</span>}
                             </div>
                         </button>
                     ))}
@@ -329,13 +313,10 @@ const SeaofWord = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 {isGameEnded &&
                     <div className="game-end-section4 fade-in-and-grow">
                         <div className="game-end-message">
-                            {oneMoreRound ?
-                                "答案不太正確喔，再聽一次，加油！" :
-                                <div onClick={startNewRound}>
-                                    <p>正確答案: 「{addCommasToChinese(ans)}」你答對了嗎?</p>
-                                    <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
-                                </div>
-                            }
+                            <div onClick={startNewRound}>
+                                <p>正確答案: 「{addCommasToChinese(ans)}」你答對了嗎?</p>
+                                <img src={asset('/image/icon/next.png')} alt="Next" className="next-icon" />
+                            </div>
                         </div>   
                     </div>
                 }

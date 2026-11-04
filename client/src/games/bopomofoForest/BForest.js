@@ -1,5 +1,5 @@
 // BForest.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './BForest.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
 import AudioAmplitude from '../../components/AudioAmplitude';
@@ -26,7 +26,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [correctAnswer1 , setCorrectAnswer1] = useState('A');
     const [correctAnswer2 , setCorrectAnswer2] = useState('A');
     const [callCount, setCallCount] = useState(0);
-    const [hasCheckedChoices, setHasCheckedChoices] = useState(false);
     const [aPlayed, setAPlayed] = useState(false);
     const [bPlayed, setBPlayed] = useState(false);
     const [aPlayed2, setAPlayed2] = useState(false);
@@ -47,6 +46,8 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [isRound2,setIsRound2] = useState(false)
     const [anschecked,setAnsChecked] = useState(false)
     const [anschecked2,setAnsChecked2] = useState(false)
+    // 兩題的聲音是否播過了；用 ref 才能在同一瞬間連點兩下時就擋住第二下 (state 要等重新 render 才會更新)
+    const played = useRef({ A: false, B: false });
     
 
 
@@ -56,40 +57,30 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
 
 
+    // 作答前每一題的聲音只能聽一次 (作答後可以再聽)；先記下已播放再 await，連點兩下也只會播一次
     const handleButtonClick = async (buttonType) => {
-        if (currentStep === 'speed_played'||currentStep === 'question') {  // 如果按钮已点击且还未确认答案，直接返回
+        const isFirst = buttonType === 'A';
+        if (isFirst ? (played.current.A && !anschecked) : (!isRound2 || (played.current.B && !anschecked2))) {
             return;
+        }
+        const isFirstPlay = !played.current[buttonType];
+        played.current[buttonType] = true;
+        if (isFirstPlay) {
+            setButtonClicked(true);
+            if (isFirst) {
+                setTimeout(() => setShowState(3), 3000);
+                setCurrentStep('speed_played');
+            } else {
+                setCurrentStep('speed_played2');
+            }
         }
 
         await pauseAudio(0);
-
-        let Audio1_Idx;
-
-        if (buttonType==='A') {
-            Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][0])}.mp3`, false);
-        }else{
-            Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][1])}.mp3`, false);
-        }
-
+        const Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][isFirst ? 0 : 1])}.mp3`, false);
         setNewIndex1(Audio1_Idx);
         await playAudio(Audio1_Idx);
 
-
         setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
-
-        // 如果已经确认答案，可以再次播放
-        if (hasCheckedChoices) {
-            return;
-        }
-
-        setButtonClicked(true);
-
-        if (buttonType==='A') {
-            setTimeout(() => setShowState(3), 3000);
-            setCurrentStep('speed_played');
-        }else{
-            setCurrentStep('speed_played2');
-        }
     };
 
     const handleButtonClick_2 = async (buttonType) => {
@@ -108,7 +99,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     };
 
     const handleButtonClick_3 = async (buttonType) => {
-        if (currentStep === 'checkAns2'|| currentStep === 'playback') {
+        if (!played.current.B || currentStep === 'checkAns2'|| currentStep === 'playback') { // 要先聽過第二題
             return;
         }
         if (!anschecked2) {
@@ -189,7 +180,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             }
             setTimeout(() => {setShowState(4);}, 3000);
             setIsRound2(true);
-            setHasCheckedChoices(true);
             setButtonClicked(false);
         }else{
             const score = choice === correctAnswer2 ? 5 : 0;
@@ -200,7 +190,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 setAnswerResult2('incorrect');
             }
             submitScore(username, choicedGamedata[2], score+ totalscore);
-            setHasCheckedChoices(true);
             setIsGameEnded(true);
             setButtonClicked(false);
         }
@@ -211,7 +200,6 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
          setCallCount(prevCount => prevCount + 1); 
          setButtonClicked(false);
 
-        setHasCheckedChoices(false);
 
          setIsLevelCompleted(true);
          setCurrentStep('playback');
@@ -222,6 +210,7 @@ const BForest = ({ choicedGamedata, username, setIsLevelCompleted }) => {
          setIsRound2(false);
          setAnsChecked(false);
          setAnsChecked2(false);
+         played.current = { A: false, B: false };
     };
 
     useEffect(() => {

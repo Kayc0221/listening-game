@@ -8,7 +8,7 @@ import { GAMES } from './gameConfig';
 import AnimatedTitle from '../components/AnimatedTitle';
 import { ApiError, getPlayedGames, selectRandomGames } from '../api';
 import { asset } from '../asset';
-import { TOTAL_SESSIONS, completedSessions } from '../progress';
+import { TOTAL_SESSIONS, completedSessions, countedLevels } from '../progress';
 
 
 const GameSelector = ({ username }) => {
@@ -29,6 +29,12 @@ const GameSelector = ({ username }) => {
 
     const gameName = GAMES[selectedGame]?.name;
 
+    // 先在背景下載之後會用到的大張背景圖，換場時就不用等圖片
+    useEffect(() => {
+        ['/image/tips-background.jpg', '/image/End-round.jpg', '/image/hint.jpg', '/image/endding.jpg']
+            .forEach((path) => { new Image().src = asset(path); });
+    }, []);
+
     const startGameAnimation = () => {
         //pauseAudio(0);
         setIsAnimating(true);
@@ -40,7 +46,7 @@ const GameSelector = ({ username }) => {
         removeAudio(0);
         setIsAuthenticated(false);
         setCurrentUser(null);
-        setBackground(asset(`/image/main-menu.png`));
+        setBackground(asset(`/image/main-menu.jpg`));
     };
 
     // 取得這個遊戲要玩的關卡；回傳 null 表示這個遊戲目前沒有新題目
@@ -118,7 +124,7 @@ const GameSelector = ({ username }) => {
         if (gameRounds !== 4) return;
         setBackground(asset(`/image/hint.jpg`));
         getPlayedGames(username)
-            .then((data) => setIsJourneyComplete(completedSessions((data.playedGames || []).length) >= TOTAL_SESSIONS))
+            .then((data) => setIsJourneyComplete(completedSessions(countedLevels(data.playedGames)) >= TOTAL_SESSIONS))
             .catch((error) => console.error('Error fetching played games:', error));
     }, [gameRounds]);
 
@@ -128,16 +134,18 @@ const GameSelector = ({ username }) => {
         let speed = 100;
         let elapsedTime = 0;
         let totalTime = 1000 * availableGames.length + Math.random() * 2000; // 基本時間加上隨機值
+        // 先公平地抽好要停在哪個遊戲，輪盤轉夠久之後再轉到它才停下
+        // (之前停在哪裡由轉動時間決定，各遊戲機率不平均，第一輪常常停在同一個遊戲)
+        const targetGame = availableGames[Math.floor(Math.random() * availableGames.length)];
 
 
         const runAnimation = () => {
             const currentGame = availableGames[gameIndex];
-            //const currentGame = availableGames[1];
             setSelectedGame(currentGame);
             gameIndex = (gameIndex + 1) % availableGames.length; // 使其循環
             elapsedTime += speed;
 
-            if (elapsedTime < totalTime) {
+            if (elapsedTime < totalTime || currentGame !== targetGame) {
                 speed += (15 + Math.random() * 10);  // 逐漸變慢
                 setTimeout(runAnimation, speed);
             } else {
@@ -237,7 +245,7 @@ const GameSelector = ({ username }) => {
             {gameRounds === 4 && !isJourneyComplete && (
                 <>
                     <img
-                        src={asset(`/image/End-round.png`)}
+                        src={asset(`/image/End-round.jpg`)}
                         alt={`Game Icon ${selectedGame}`}
                         className="game-icon-expanded"
                     />

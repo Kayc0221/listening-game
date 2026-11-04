@@ -4,7 +4,7 @@ import './ProgressBar.css';
 import { getPlayedGames } from '../api';
 import { asset } from '../asset';
 import { useAuth } from '../contexts/AuthContext';
-import { LEVELS_PER_SESSION, TOTAL_SESSIONS, completedSessions } from '../progress';
+import { LEVELS_PER_SESSION, TOTAL_SESSIONS, completedSessions, countedLevels } from '../progress';
 
 const FILL_DURATION_MS = 3000; // 燃料從目前高度慢慢升到新高度的時間，與 CSS 的 transition 一致
 const ENTRANCE_MS = 3500; // 等 .fade-in-and-grow 的進場動畫 (延遲 1.5 秒 + 2 秒) 結束再開始填充
@@ -54,7 +54,7 @@ const ProgressBar = ({ username }) => {
     useEffect(() => {
         let isMounted = true;
         getPlayedGames(username)
-            .then((data) => { if (isMounted) setPlayedCount((data.playedGames || []).length); })
+            .then((data) => { if (isMounted) setPlayedCount(countedLevels(data.playedGames)); })
             .catch((error) => console.error('Error fetching played games:', error));
         return () => { isMounted = false; };
     }, [username, progressVersion]);

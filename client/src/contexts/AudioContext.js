@@ -13,6 +13,14 @@ export const preloadAudio = (src) => {
     fetch(url).catch(() => preloaded.delete(url));
 };
 
+// 各遊戲音檔錄音音量不同：ㄅㄅ森林 (game3) 的 mp3 比其他遊戲的 wav 小約 7 dB (RMS 約 -23 dB vs -16 dB)，
+// 播放時補上增益讓音量一致 (約 +7 dB；個別檔案音量差很多，後面再接限幅器)
+const SOURCE_GAIN = { 'game3/': 2.2 };
+const sourceGain = (src) => {
+    const prefix = Object.keys(SOURCE_GAIN).find((p) => src.startsWith(p));
+    return prefix ? SOURCE_GAIN[prefix] : 1;
+};
+
 export const useAudio = () => {
     const context = useContext(AudioContext);
     if (!context) {
@@ -64,9 +72,25 @@ export const AudioProvider = ({ children }) => {
             newAudio.loop = shouldLoop;
             newAudio.volume = volume; // 使用相同的音量
             source = audioContext.current.createMediaElementSource(newAudio);
+            const gain = sourceGain(src);
+            if (gain !== 1) {
+                const gainNode = audioContext.current.createGain();
+                gainNode.gain.value = gain;
+                // 少數檔案本來就接近滿格 (峰值約 -2 dB)，放大後用限幅器壓住，避免破音
+                const limiter = audioContext.current.createDynamicsCompressor();
+                limiter.threshold.value = -3;
+                limiter.knee.value = 0;
+                limiter.ratio.value = 20;
+                limiter.attack.value = 0.002;
+                limiter.release.value = 0.1;
+                source.connect(gainNode);
+                gainNode.connect(limiter);
+                source = limiter;
+            }
         }
 
         source.connect(analyser.current);
+        newAudio.outputNode = source; // 移除時要斷開，否則播過的音訊節點整個遊戲期間都接在音訊圖上
 
         // 播完後移除「這個」音訊 (之前用陣列最後一個索引，播完時可能已經不是它)
         const index = audioSources.current.length;
@@ -91,6 +115,7 @@ export const AudioProvider = ({ children }) => {
                 targetAudio.pause();
                 targetAudio.src = ""; // 清空音頻源，這一步可能是可選的
             }
+            if (targetAudio.outputNode) targetAudio.outputNode.disconnect();
             audioSources.current[index] = null;
         }
     };
@@ -110,6 +135,7 @@ export const AudioProvider = ({ children }) => {
                     }
                 } else if (audio instanceof Audio) {
                     audio.pause();
+                    if (audio.outputNode) audio.outputNode.disconnect();
                 }
                 audioSources.current[idx] = null;
             }

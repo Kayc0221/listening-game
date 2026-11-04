@@ -1,5 +1,5 @@
 // BForest2.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './BForest2.css'; // 引入外部 CSS
 import AnimatedTitle from '../../components/AnimatedTitle';
 import AudioAmplitude from '../../components/AudioAmplitude';
@@ -39,6 +39,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     const [selectedOption, setSelectedOption] = useState(null);
     const [answerResult, setAnswerResult] = useState(null); // 'correct' 或 'incorrect'
 
+    const playedBeforeAnswer = useRef(false); // 用 ref：同一瞬間連點兩下也只播一次
     const [Difficulty, setDifficulty] = useState(0);
     const [averageScore, setAverageScore] = useState(null);
     const [difficultyFor, setDifficultyFor] = useState(null); // 難度是用哪一關的題目算的
@@ -62,39 +63,24 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
     };
 
 
-    const handleButtonClick = async (buttonType) => {
-        if (!isReady || currentStep === 'speed_played'||currentStep === 'question') {  // 如果按钮已点击且还未确认答案，直接返回
+    // 作答前只能聽一次 (作答後可以再聽)；先改狀態再 await，連點兩下也只會播一次
+    const handleButtonClick = async () => {
+        if (!isReady || playedBeforeAnswer.current) {
             return;
+        }
+        if (!hasCheckedChoices) {
+            playedBeforeAnswer.current = true;
+            setButtonClicked(true);
+            setTimeout(() => setShowState(3), 3000);
+            setCurrentStep('speed_played');
         }
 
         await pauseAudio(0);
-
-        let Audio1_Idx;
-
-        if (buttonType==='A') {
-            Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][Difficulty])}.mp3`, false);
-        }
-
+        const Audio1_Idx = await addAudio(`game3/${translateZhuyinToCode(choicedGamedata[1][Difficulty])}.mp3`, false);
         setNewIndex1(Audio1_Idx);
         await playAudio(Audio1_Idx);
 
-
         setTimeout(() => playAudio(0), 5000); // 5 秒後恢復背景音樂
-
-        // 如果已经确认答案，可以再次播放
-        if (hasCheckedChoices) {
-            return;
-        }
-
-        // 播放完毕，展示问题
-        setButtonClicked(true);
-
-        if (buttonType==='A') {
-            setTimeout(() => setShowState(3), 3000);
-            setCurrentStep('speed_played');
-        }else{
-            setCurrentStep('speed_played2');
-        }
     };
 
     const handleButtonClick_2 = async (buttonType) => {
@@ -102,6 +88,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
             return;
         }
         setSelectedOption(buttonType);
+        playedBeforeAnswer.current = false; // 作答後可以再聽
         checkChoices(buttonType);
         setCurrentStep('checkAns');
         return;
@@ -197,6 +184,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
 
          setIsLevelCompleted(true);
          setCurrentStep('playback');
+         playedBeforeAnswer.current = false;
         // 重置遊戲結束標記
          setIsGameEnded(false);
          setAnswerResult('Null')
@@ -234,7 +222,7 @@ const BForest2 = ({ choicedGamedata, username, setIsLevelCompleted }) => {
                 )}
             {showState >= 2 && (
                     <div className="audio-control">
-                        <div className={`playButton ${!buttonClicked && isReady ? 'showClickme' : ''} ${!isReady ? 'is-waiting' : ''}`} onClick={() => handleButtonClick('A')}></div>
+                        <div className={`playButton ${!buttonClicked && isReady ? 'showClickme' : ''} ${!isReady ? 'is-waiting' : ''}`} onClick={handleButtonClick}></div>
                         <AudioAmplitude />
                     </div>
             )}
